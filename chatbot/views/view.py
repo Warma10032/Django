@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from .models import User
-from .forms import UserForm
+from chatbot.models import User
+from chatbot.forms import UserForm
 
 # 建议Views分文件存储
 def login(request):
@@ -8,12 +8,12 @@ def login(request):
         username = request.POST['username']
         password = request.POST['password']
         if username == 'admin' and password == '123456':  # 这里的用户是固定的，实际上应该加密存储到数据库
-            return redirect('user_list')
+            return redirect('chat_view')
         else:
             return render(request, 'login.html', {'error': 'Invalid credentials'})
     return render(request, 'login.html')
 
-
+# 下面的代码目前没用，保留为后续连接数据库进行参考
 def user_list(request):
     users = User.objects.all()
     return render(request, 'user_list.html', {'users': users})
