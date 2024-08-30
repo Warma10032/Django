@@ -18,3 +18,6 @@ def chat_view(request):
             return JsonResponse({"error": "Failed to get response from AI"}, status=500)
     return render(request, "chat.html")
 
+def grodio_chat_view(request):
+    return render(request, 'chat.html')
+
