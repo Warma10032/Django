@@ -7,8 +7,10 @@ from fastapi import FastAPI
 from django.http import HttpResponse
 from django.core.handlers.asgi import ASGIHandler
 
-def gradio_chat_interface(user_message):
-    try:
+def chat_view(request):
+    if request.method == "POST":
+        user_message = request.POST.get("message")
+        # 向Flask后端发送请求,在app.py文件中
         response = requests.post(
             "http://127.0.0.1:5000/chat",
             json={"message": user_message}
@@ -17,20 +19,9 @@ def gradio_chat_interface(user_message):
             ai_response = response.json().get("response")
             return ai_response
         else:
-            return "Failed to get response from AI"
-    except Exception as e:
-        return str(e)
+            return JsonResponse({"error": "Failed to get response from AI"}, status=500)
+    return render(request, "chat.html")
 
-def chat_view(request):
-    iface = gr.Interface(
-        fn=gradio_chat_interface,
-        inputs="text",
-        outputs="text",
-        title="Chat with AI",
-        description="Enter a message and receive a response from the AI."
-    )
+def grodio_chat_view(request):
+    return render(request, 'chat.html')
 
-    # 使用 `launch` 方法生成 FastAPI 应用
-    app, _, _ = iface.launch(server_name="localhost", server_port=7965, share=False, inline=False, inbrowser=False, debug=True, prevent_thread_lock=True)
-    
-    return redirect("http://localhost:7865")
