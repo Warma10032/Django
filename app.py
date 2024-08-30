@@ -8,8 +8,8 @@ app = Flask(__name__)
 class LLMClient(object):
     def __init__(self):
         self.__client = OpenAI(
-            api_key = 'a3ed8da29b31673048410a09e4ece9cf.ktgvNbfAlPgqYYye',  # get_env_value("LLM_API_KEY"),
-            base_url = 'https://open.bigmodel.cn/api/paas/v4/', # get_env_value("LLM_BASE_URL"),
+            api_key = 's',  # get_env_value("LLM_API_KEY"),
+            base_url = 'http://localhost:8000/v1/', # get_env_value("LLM_BASE_URL"),
         )
         self.__model_name = 'glm-4' # get_env_value("MODEL_NAME")
 

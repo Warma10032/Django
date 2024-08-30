@@ -5,7 +5,7 @@ from django.http import JsonResponse
 def chat_view(request):
     if request.method == "POST":
         user_message = request.POST.get("message")
-        # 向Flask后端发送请求
+        # 向Flask后端发送请求,在app.py文件中
         response = requests.post(
             "http://127.0.0.1:5000/chat",
             json={"message": user_message}
