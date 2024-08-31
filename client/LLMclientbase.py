@@ -1,14 +1,14 @@
-from abc import abstractmethod, ABCMeta, ABC
-from typing import List, Dict
+from env import get_env_value
+from abc import abstractmethod
 
-from openai import OpenAI, Stream
+from openai import OpenAI
+from openai import Stream
 from openai.types.chat import ChatCompletion, ChatCompletionChunk
 
-from env import get_env_value
-# from utils.singleton import Singleton
+from typing import List, Dict
 
-
-class LLMClientBase(object):
+# 抽象类，用于构造client
+class LLMclientbase(object):
     def __init__(self):
         self.__client = OpenAI(
             api_key=get_env_value("LLM_API_KEY"),
@@ -17,21 +17,17 @@ class LLMClientBase(object):
         self.__model_name = get_env_value("MODEL_NAME")
 
     @property
-    def client(self) -> OpenAI:
+    def client(self):
         return self.__client
-
+    
     @property
-    def model_name(self) -> str:
+    def model_name(self):
         return self.__model_name
 
+    # 一下全都是抽象函数
     @abstractmethod
     def chat_with_ai(self, prompt: str) -> str | None:
         raise NotImplementedError()
-
-
-    @staticmethod
-    def construct_messages(prompt: str, history: List[List | None]) -> List[Dict[str, str]]:
-        pass
 
     @abstractmethod
     def chat_with_ai_stream(self, prompt: str,
@@ -39,5 +35,5 @@ class LLMClientBase(object):
         raise NotImplementedError()
 
     @abstractmethod
-    def chat_using_messages(self, messages: List[Dict]) -> str | None:
+    def construct_message(self, prompt: str, history: List[List[str]] | None = None) -> List[Dict[str,str]] | str | None:
         raise NotImplementedError()
