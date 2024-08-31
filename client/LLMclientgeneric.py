@@ -5,15 +5,16 @@ from openai import OpenAI
 from openai.types.chat import ChatCompletion,ChatCompletionChunk
 from openai import Stream
 
-from LLMclientbase import LLMclientbase
+from client.LLMclientbase import LLMclientbase
 from overrides import override
 
 # 实例化函数
 class LLMclientgeneric(LLMclientbase):
-    def __init__(self,*args,**krgs):
-        super().__init__
 
-    # 该函数只负责单论对话交流，不包括力是
+    def __init__(self,*args,**krgs):
+        super().__init__()
+
+    # 该函数只负责单论对话交流，不包括历史
     @override
     def chat_with_ai(self, prompt: str) -> str | None:
        response = self.client.chat.completions.create(
@@ -25,7 +26,7 @@ class LLMclientgeneric(LLMclientbase):
             temperature=0.95,
             max_tokens=1024,
        )
-       response.choices[0].message.content
+       return response.choices[0].message.content
 
     @override
     def chat_with_ai_stream(self, prompt: str,
@@ -41,7 +42,7 @@ class LLMclientgeneric(LLMclientbase):
         return response
 
     @override
-    def construct_message(self, prompt: str, history: List[List[str]] | None = None) -> List[Dict[str,str]]:
+    def construct_message(self, prompt: str, history: List[List[str]] | None = None) -> List[Dict[str,str]] | str | None:
         messages = [
         {"role": "system", "content": "你是一个乐于解答各种问题的助手，你的任务是为用户提供专业、准确、有见地的回答。"}]
 

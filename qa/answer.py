@@ -2,12 +2,13 @@ from typing import Tuple, List, Any
 
 
 #from qa.function_tool import map_question_to_function, map_question_to_function_args
-from qa.question_parser import parse_question, check_entity, QuestionType
+from qa.question_parser import parse_question
+from qa.purpose_type import userPurposeType
 
 
 def get_answer(question: str,
                history: List[List | None] = None) -> (
-        Tuple[Any, QuestionType]):
+        Tuple[Any, userPurposeType]):
     """
     根据问题获取答案或者完成任务
     :param history:
@@ -17,6 +18,8 @@ def get_answer(question: str,
     # 判断问题类型，选择不同的函数
     question_type = parse_question(question)
     print(question_type)
+
+    
 
     # entities = check_entity(question)
 

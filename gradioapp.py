@@ -1,12 +1,20 @@
 import gradio as gr
-from client.llm_client_generic import LLMClientGeneric
+from qa.answer import get_answer
+from client.LLMclientgeneric import LLMclientgeneric
+from icecream import ic
 
+def grodio_chat_view(message,history):
+        ic(message)
+        ic(history)
+        
+        print('zzz')
 
-def chat_with_ai(message):
-        client = LLMClientGeneric()
-        response = client.chat_with_ai(message)
-        return response
+        response = get_answer(message,history)
+
+        return "hhh"
     
-interface = gr.Interface(fn=chat_with_ai, inputs="text", outputs="text")
+interface = gr.ChatInterface(fn=grodio_chat_view ,
+        chatbot=gr.Chatbot(height=400),
+        textbox=gr.Textbox(placeholder="请输入你的问题", container=False, scale=7))
 interface.launch(server_name="0.0.0.0", server_port=7860)
 

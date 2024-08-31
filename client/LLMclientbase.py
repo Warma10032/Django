@@ -22,7 +22,7 @@ class LLMclientbase(object):
     
     @property
     def model_name(self):
-        return self.model_name
+        return self.__model_name
 
     # 一下全都是抽象函数
     @abstractmethod
@@ -35,5 +35,5 @@ class LLMclientbase(object):
         raise NotImplementedError()
 
     @abstractmethod
-    def construct_message(self, prompt: str) -> str | None:
+    def construct_message(self, prompt: str, history: List[List[str]] | None = None) -> List[Dict[str,str]] | str | None:
         raise NotImplementedError()

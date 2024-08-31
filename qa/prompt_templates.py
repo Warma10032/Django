@@ -22,6 +22,6 @@ def get_question_parser_prompt(text: str) -> str:
     :param text: 输入的文本
     :return: prompt
     """
-    return f"{purpose_type_template}+{text}"
+    return f"{purpose_type_template} {text}"
 
 

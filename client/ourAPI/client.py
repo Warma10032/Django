@@ -1,5 +1,5 @@
 from openai import OpenAI
-from LLMclientgeneric import LLMclientgeneric
+from client.LLMclientgeneric import LLMclientgeneric
 
 class OurAPI(LLMclientgeneric):
     def __init__(self,*args,**krgs):
