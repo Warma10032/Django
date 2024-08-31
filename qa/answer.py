@@ -1,7 +1,7 @@
 from typing import Tuple, List, Any
 
-
-#from qa.function_tool import map_question_to_function, map_question_to_function_args
+#, map_question_to_function_args
+from qa.function_tool import map_question_to_function
 from qa.question_parser import parse_question
 from qa.purpose_type import userPurposeType
 
@@ -23,11 +23,13 @@ def get_answer(question: str,
 
     # entities = check_entity(question)
 
-    # function = map_question_to_function(question_type)
+    function = map_question_to_function(question_type)
     # args_getter = map_question_to_function_args(question_type)
     # args = args_getter([question_type, question, history, entities])
 
-    # result = function(*args)
+    args = [question_type,question,history]
+
+    result = function(*args)
 
     # # 如果上面的代码不行则直接默认问题类型为unknown,就用chat解决
     # if not result:
@@ -36,4 +38,4 @@ def get_answer(question: str,
     #     args = args_getter([question_type, question, history, entities])
     #     result = function(*args)
 
-    # return result
+    return result

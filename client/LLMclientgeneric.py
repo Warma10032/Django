@@ -28,12 +28,13 @@ class LLMclientgeneric(LLMclientbase):
        )
        return response.choices[0].message.content
 
+    # 该函数支持流式输出并且可以输入历史
     @override
     def chat_with_ai_stream(self, prompt: str,
                             history: List[List[str]] | None = None) -> ChatCompletion | Stream[ChatCompletionChunk]:
         response = self.client.chat.completions.create(
             model=self.model_name,
-            messages=self.construct_messages(prompt, history if history else []),
+            messages=self.construct_message(prompt, history if history else []),
             top_p=0.7,
             temperature=0.95,
             max_tokens=1024,

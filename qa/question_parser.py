@@ -11,8 +11,9 @@ def parse_question(question: str) -> userPurposeType:
     prompt = get_question_parser_prompt(question)
     response = Clientfactory().get_client().chat_with_ai(prompt)
 
-    if response is None:
-        return "其他"
+    # 这里暂时还没有实现其他意图的功能,暂时全部设置成其他类型
+    if response is not None:
+        return purpose_map["其他"]
     purpose_type = purpose_map[response]
     ic(purpose_type)
 

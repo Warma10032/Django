@@ -2,7 +2,7 @@ from enum  import Enum
 
 class userPurposeType(Enum):
     #根据用户输入的文本信息的可能问题类型预定义
-    Unkown= 0  #未知问题
+    Unknown= 0  #未知问题
     Text = 1    #普通文本问题
     Voice = 2   #语音生成
     Audio = 3   #视频生成
@@ -13,7 +13,7 @@ class userPurposeType(Enum):
 
     
 purpose_map={
-"其他":userPurposeType.Unkown,
+"其他":userPurposeType.Unknown,
 "文本生成":userPurposeType.Text,
 "语音生成":userPurposeType.Voice,
 "视频生成":userPurposeType.Audio,
