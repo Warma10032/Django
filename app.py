@@ -25,6 +25,7 @@ def grodio_chat_view(message,history):
             for chunk in answer[0]:
                 partial_message = partial_message + (chunk.choices[0].delta.content or "")
                 yield partial_message
+                
         if answer[1] == userPurposeType.ImageGeneration:
             image_url = answer[0]
             combined_message = f'''
