@@ -1,6 +1,8 @@
 from env import get_env_value
-
 from client.ourAPI.client import OurAPI
+from qa.purpose_type import userPurposeType
+
+from client.zhipuAPI.client import Image_client
 class Clientfactory:
     map_client_dict = {
         get_env_value("LLM_BASE_URL")
@@ -19,5 +21,18 @@ class Clientfactory:
  
     # 注意python面向对象里面的函数会自动传入一个self类,所以参数里面必须加上self,否则会报错
     def get_client(self):
-        
+          return OurAPI()
+
+
+    @staticmethod
+    def get_special_client(client_type:str):
+        print(userPurposeType.ImageGeneration)
+        if client_type == userPurposeType.ImageGeneration:
+            print(3)
+            return Image_client
+        if client_type == userPurposeType.Unknown:
+
+            return OurAPI()
+        print(5)
+        #默认情况下使用文本生成模型
         return OurAPI()
