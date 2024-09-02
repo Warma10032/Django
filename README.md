@@ -6,6 +6,8 @@
 
 运行manage.py `python manage.py runserver`
 
+retrieve_model里embedding模型的文件路径改成自己的模型文件路径，在`user/.cache/modelscope`下
+
 报错可能：
 
 1. Django数据库模型更改后需要进行迁移（请搜索如何操作）
