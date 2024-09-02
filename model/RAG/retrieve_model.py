@@ -36,7 +36,7 @@ class Retrievemodel(Modelbase):
         loader = PyPDFDirectoryLoader(path=self._pdf_data_path)
         docs = loader.load()
 
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
         splits = text_splitter.split_documents(docs)
         vectorstore = FAISS.from_documents(documents=splits, embedding=self._embedding)
         self._retriever = vectorstore.as_retriever(search_kwargs={"k": 6})
