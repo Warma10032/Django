@@ -20,7 +20,7 @@ class Retrievemodel(Modelbase):
         super().__init__(*args,**krgs)
 
         # 此处请自行改成下载embedding模型的位置
-        self._embedding_model_path =r'C:\\Users\\李衍铭\.cache\\modelscope\\hub\\iic\\nlp_corom_sentence-embedding_chinese-base'
+        self._embedding_model_path =r'C:/Users/16013/.cache/modelscope/hub/iic/nlp_corom_sentence-embedding_chinese-base'
         self._loader = PyPDFDirectoryLoader # 先做成pdf加载，后续添加网页加载功能
         self._text_splitter = RecursiveCharacterTextSplitter
         #self._embedding = OpenAIEmbeddings()
