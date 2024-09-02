@@ -6,7 +6,7 @@ from openai.types.chat import ChatCompletionChunk
 from client.clientfactory import Clientfactory
 
 def invoke(question:str, history:List[List])->Stream[ChatCompletionChunk]:
-    docs,_context = retrieve_docs(question) # 此处得到的是文件和文件处理后的文本
+    docs,_context = retrieve_docs(question) # 此处得到的是检索到的文件片段和文件处理后的文本
     
     prompt = f"请根据搜索到的文件信息\n{_context}\n 回答问题：\n{question}"
     response = Clientfactory().get_client().chat_with_ai_stream(prompt)
