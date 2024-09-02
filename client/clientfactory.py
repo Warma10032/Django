@@ -31,7 +31,6 @@ class Clientfactory:
             print(3)
             return Image_client
         if client_type == userPurposeType.Unknown:
-
             return OurAPI()
         print(5)
         #默认情况下使用文本生成模型

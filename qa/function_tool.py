@@ -8,6 +8,7 @@ def process_unknown_tool(question_type,question,history):
     response = Clientfactory().get_client().chat_with_ai_stream(question,history)
     return (response,question_type)
 
+# 处理ImageGeneration问题的函数
 def process_images_tool(question_type,question,history):
    print(1)
    print(question_type)
