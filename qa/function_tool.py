@@ -33,7 +33,7 @@ def process_images_tool(question_type,question,history):
 
 QUESTION_TO_FUNCTION = {
     userPurposeType.Unknown : process_unknown_tool,
-    userPurposeType.Ducument : RAG_tool
+    userPurposeType.Ducument : RAG_tool,
     userPurposeType.Unknown: process_unknown_tool,
     userPurposeType.ImageGeneration: process_images_tool
 }
