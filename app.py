@@ -12,16 +12,14 @@ AVATAR = ("resource/user.png",
 def grodio_chat_view(message,history):
         ic(message)
         ic(history)
-        
-        print('zzz')
 
         answer = get_answer(message,history)
 
         partial_message=""
         print(answer)
 
-        # Unkno
-        if answer[1] == userPurposeType.Unknown:
+        # Unknown
+        if answer[1] == userPurposeType.Unknown or answer[1] == userPurposeType.Ducument:
             for chunk in answer[0]:
                 partial_message = partial_message + (chunk.choices[0].delta.content or "")
                 yield partial_message
