@@ -19,6 +19,7 @@ def get_file_path(text):
 def audio_generate(text: str, model_name: str) -> str:
     _output_file = get_file_path(text)
 
+    # 异步调用_generating函数，使得I/O时可以进行其他操作
     async def _generating() -> None:
         communicate = edge_tts.Communicate(text, model_name)
         await communicate.save(_output_file)

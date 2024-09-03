@@ -41,15 +41,18 @@ def process_audio_tool(question_type : userPurposeType,
              question : str,history:List[List | None]=None):
     # 先让大语言模型生成需要转换成语音的文字
     text = extract_text(question, history)
-    # 判断需要生成哪种语应（川，粤...）
+    # 判断需要生成哪种语言（东北、陕西、粤...）
     lang = extract_language(question)
     # 判断需要生成男声还是女声
     gender = extract_gender(question)
     # 上面三步均与大语言模型进行交互
+    
     # 选择用于生成的模型
-    model_name = get_tts_model_name(lang=lang, gender=gender)
-    audio_file = audio_generate(text, model_name)
-
+    model_name , seleted = get_tts_model_name(lang=lang, gender=gender)
+    if(seleted==True):
+        audio_file = audio_generate(text, model_name)
+    else:
+        audio_file = audio_generate("未找到合适的语音模型，将用普通话回复" + text, model_name)
     return((audio_file, "语音"),userPurposeType.Audio)
 
 QUESTION_TO_FUNCTION = {
