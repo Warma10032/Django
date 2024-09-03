@@ -7,3 +7,5 @@ migrations/
 .vscode/
 flagged/
 project/settings.py
+
+/data/cache/audio

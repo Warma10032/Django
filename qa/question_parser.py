@@ -20,6 +20,8 @@ def parse_question(question: str) -> userPurposeType:
         return purpose_map["其他"]
     if response == "图片生成":
         return purpose_map["图片生成"]
+    if response == "音频生成":
+        return purpose_map["音频生成"]
   #默认情况
     purpose_type = purpose_map["其他"]
     return purpose_type

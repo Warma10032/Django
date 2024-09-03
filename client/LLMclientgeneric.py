@@ -54,3 +54,16 @@ class LLMclientgeneric(LLMclientbase):
 
         messages.append({"role": "user", "content": prompt})
         return messages
+
+
+    @override
+    def chat_using_messages(self, messages: List[Dict]) -> str | None:
+        response = self.client.chat.completions.create(
+            model=self.model_name,
+            messages=messages,
+            top_p=0.7,
+            temperature=0.95,
+            max_tokens=1024,
+        )
+
+        return response.choices[0].message.content

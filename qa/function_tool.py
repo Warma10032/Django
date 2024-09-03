@@ -5,6 +5,11 @@ from qa.purpose_type import userPurposeType
 
 from rag import rag_chain
 
+from audio.audio_extract import extract_text,extract_language,\
+extract_gender,get_tts_model_name
+
+from audio.audio_generate import audio_generate
+
 # 处理Unkown问题的函数
 def process_unknown_tool(question_type : userPurposeType,
              question : str,history:List[List | None]=None):
@@ -31,10 +36,27 @@ def process_images_tool(question_type,question,history):
    print(response.data[0].url)
    return (response.data[0].url,question_type)
 
+# 处理audio问题的函数
+def process_audio_tool(question_type : userPurposeType,
+             question : str,history:List[List | None]=None):
+    # 先让大语言模型生成需要转换成语音的文字
+    text = extract_text(question, history)
+    # 判断需要生成哪种语应（川，粤...）
+    lang = extract_language(question)
+    # 判断需要生成男声还是女声
+    gender = extract_gender(question)
+    # 上面三步均与大语言模型进行交互
+    # 选择用于生成的模型
+    model_name = get_tts_model_name(lang=lang, gender=gender)
+    audio_file = audio_generate(text, model_name)
+
+    return((audio_file, "语音"),userPurposeType.Audio)
+
 QUESTION_TO_FUNCTION = {
     userPurposeType.Unknown : process_unknown_tool,
     userPurposeType.Ducument : RAG_tool,
-    userPurposeType.ImageGeneration: process_images_tool
+    userPurposeType.ImageGeneration: process_images_tool,
+    userPurposeType.Audio :process_audio_tool
 }
 
 
