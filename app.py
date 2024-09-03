@@ -48,7 +48,7 @@ interface = gr.ChatInterface(fn=grodio_chat_view ,
         title="「赛博华佗」📒", # 聊天界面的标题
         description="你的健康小助手", # 聊天界面的描述
         theme="default", # 主题
-        examples=["您好",  "你会写代码吗","给我一个健身计划","帮我生成一张老人练太极图片"],
+        examples=["您好",  "用python写一个hello world代码","给我一个健身计划","帮我生成一张老人练太极图片","根据文献，解释一下糖尿病"],
         cache_examples=False, # 是否缓存示例输入
         retry_btn=None, # 重试按钮的配置
         submit_btn="发送",

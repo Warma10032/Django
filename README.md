@@ -6,7 +6,7 @@
 
 运行manage.py `python manage.py runserver`
 
-retrieve_model里embedding模型的文件路径改成自己的模型文件路径，在`user/.cache/modelscope`下
+`model/RAG/retrieve_model.py`里embedding模型`_embedding_model_path`的文件路径改成自己的模型文件路径，在 `user/.cache/modelscope`下
 
 报错可能：
 

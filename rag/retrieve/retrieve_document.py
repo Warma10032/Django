@@ -6,7 +6,8 @@ def format_docs(docs:List[Document]):
     return "\n\n".join(doc.page_content for doc in docs)
 
 def retrieve_docs(question:str)->Tuple[List[Document],str]:
-    docs = retrieve(question)#这里的到的是文件
-    _context = format_docs(docs)#这里处理成文本
+    docs = retrieve(question) # 这里的到的是文件
+    _context = format_docs(docs) # 这里处理成文本
+    print(_context)
     return (docs,_context)
     
