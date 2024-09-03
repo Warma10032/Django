@@ -35,6 +35,9 @@ def grodio_chat_view(message,history):
                     '''
             yield combined_message
 
+        if answer[1] ==userPurposeType.Audio:
+             yield answer[0]
+
 
 
 

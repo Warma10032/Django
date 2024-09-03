@@ -37,3 +37,7 @@ class LLMclientbase(object):
     @abstractmethod
     def construct_message(self, prompt: str, history: List[List[str]] | None = None) -> List[Dict[str,str]] | str | None:
         raise NotImplementedError()
+
+    @abstractmethod
+    def chat_using_messages(self, messages: List[Dict]) -> str | None:
+        raise NotImplementedError()
