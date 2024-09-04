@@ -16,21 +16,62 @@ from model.KG.search_model import _Value
 
 _dao = GraphDao()
 
-def relation_tool(entities: List[_Value] | None) -> str:
-    if not entities or len(entities) < 2:
+def relation_tool(entities: List[_Value] | None) -> str | None:
+    if not entities or len(entities) == 0:
+        return "未提供任何实体。"
+    
+    relationships = set()  # 使用集合来避免重复关系
+    relationship_match=[]
+    
+    # 遍历每个实体并查询与其他实体的关系
+    for entity in entities:
+        entity_name = entity.name
+        
+        # 查询每个实体与其他实体的关系
+        relationship_match.append(_dao.query_relationship_by_person_name(entity_name)) 
+        
+    for record in relationship_match:
+        # 获取起始节点和结束节点的名称
+        start_name = record[0]['r'].start_node['name']
+        end_name = record[0]['r'].end_node['name']
+        
+        # 获取关系类型
+        rel = type(record[0]['r']).__name__  # 获取关系的类名，比如 CAUSES
+        
+        # # 获取关系的备注信息，假设关系中可能有一个 'Notes' 属性
+        # notes = getattr(record['r'], 'Notes', '无')
+        
+        # 构建关系字符串，打印或存储关系信息
+        print(f"{start_name} {rel} {end_name}")
+
+            
+            # 构建关系字符串并添加到集合，确保不会重复添加
+        relationships.add(f"{start_name} {rel} {end_name}")
+    
+    # 处理实体之间的直接关系，避免重复
+    # if len(entities) > 1:
+    #     for i in range(len(entities)):
+    #         for j in range(i + 1, len(entities)):
+    #             entity1_name = entities[i].name
+    #             entity2_name = entities[j].name
+                
+    #             # 查询两个实体之间是否有直接关系
+    #             relationship_match_direct = _dao.query_relationship_by_2person_name(entity1_name, entity2_name)
+                
+    #             if relationship_match_direct:
+    #                 start_name = relationship_match_direct[0]['a']['name']
+    #                 rel = relationship_match_direct[0]['r']['type']
+    #                 end_name = relationship_match_direct[0]['b']['name']
+    #                 notes = relationship_match_direct[0]['r'].get('Notes', '无')
+                    
+    #                 # 添加两个实体之间的直接关系
+    #                 relationships.add(f"{start_name} 与 {end_name} 之间的关系是 {rel}，详见备注: {notes}")
+    
+    # 返回关系集合的内容
+    if relationships:
+        return "；".join(relationships)
+    else:
         return None
-    relationship_match = _dao.query_relationship_by_2person_name(entities[0].name, entities[1].name)
-    if relationship_match:
-
-        rel = relationship_match[0]['type(r)']
-        if entities[0].name not in rel:
-            start_name = entities[0].name
-        else:
-            start_name = entities[1].name
-
-        #，详见:{relationship_match[0]['r']['Notes']}
-        return f"关系如下：{rel}"
-
 
 # 处理Unkown问题的函数
 def process_unknown_tool(question_type : userPurposeType,

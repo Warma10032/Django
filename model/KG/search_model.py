@@ -8,7 +8,7 @@ from model.KG.data_utils import NodeEntities
 
 from collections import namedtuple
 
-FIELD_NAMES = {"PersonId","name","labels"}
+FIELD_NAMES = {"name"}
 _Value = namedtuple("_Value", (fn for fn in FIELD_NAMES))
 
 

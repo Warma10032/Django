@@ -37,6 +37,19 @@ class GraphDao(object):
         rel = self.__graph.run(
             f"match(:`人物`{{name:'{first_person}'}})-[r]-(:`人物`{{name:'{second_person}'}}) return r, type(r)").data()
         return rel
+    
+    @ensure_connection
+    def query_relationship_by_person_name(self, entity_name: str):
+        # 编写 Cypher 查询语句，查询指定实体作为起始或目标节点的所有关系
+        query = """
+        MATCH (a)-[r]-(b)
+        WHERE a.name = $entity_name
+        RETURN a,r,b
+
+        """
+        # 执行查询，并将查询结果返回
+        result = self.__graph.run(query, entity_name=entity_name).data()
+        return result
 
     # 请求meta_node
     @ensure_connection
