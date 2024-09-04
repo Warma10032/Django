@@ -166,7 +166,7 @@ def process_InternetSearch_tool(question_type : userPurposeType,
 
 QUESTION_TO_FUNCTION = {
     userPurposeType.Unknown : process_unknown_tool,
-    userPurposeType.Ducument : RAG_tool,
+    userPurposeType.Document : RAG_tool,
     userPurposeType.ImageGeneration: process_images_tool,
     userPurposeType.Audio :process_audio_tool,
     userPurposeType.InternetSearch : process_InternetSearch_tool,

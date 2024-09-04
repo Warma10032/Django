@@ -1,6 +1,4 @@
-
 from qa.purpose_type import purpose_map
-
 
 purpose_type_template = (f"你扮演文本分类的工具助手，类别有{len(purpose_map)}种，"
                            f"分别为：图片生成,视频生成,音频生成,图片描述,问候语,基于文件描述,PPT生成,其他。"
