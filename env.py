@@ -18,5 +18,5 @@ def get_env_value(key):
 if __name__ == '__main__':
     print("app root is: " +get_app_root())
     print("your API key is: "+ get_env_value('LLM_API_KEY'))
-    print("your url is："+get_env_value('MODEL_NAME'))
+    print("your url is: "+get_env_value('MODEL_NAME'))
    # print("DEBUG is: " + os.environ.get('PY_DEBUG'))

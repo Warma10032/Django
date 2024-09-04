@@ -24,7 +24,7 @@ class LLMclientbase(object):
     def model_name(self):
         return self.__model_name
 
-    # 一下全都是抽象函数
+    # 以下全都是抽象函数
     @abstractmethod
     def chat_with_ai(self, prompt: str) -> str | None:
         raise NotImplementedError()
@@ -40,4 +40,6 @@ class LLMclientbase(object):
 
     @abstractmethod
     def chat_using_messages(self, messages: List[Dict]) -> str | None:
+
         raise NotImplementedError()
+

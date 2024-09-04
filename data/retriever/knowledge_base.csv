@@ -1,0 +1,5 @@
+Topic,Description,Related Concepts,Reference
+Machine Learning,Field of study that gives computers the ability to learn without being explicitly programmed,Artificial Intelligence; Data Science,https://en.wikipedia.org/wiki/Machine_learning
+Supervised Learning,Machine learning task of learning a function that maps an input to an output based on example input-output pairs,Classification; Regression,https://en.wikipedia.org/wiki/Supervised_learning
+Unsupervised Learning,Type of machine learning that looks for previously undetected patterns in a data set with no pre-existing labels,Clustering; Dimensionality Reduction,https://en.wikipedia.org/wiki/Unsupervised_learning
+Reinforcement Learning,Area of machine learning concerned with how software agents ought to take actions in an environment to maximize some notion of cumulative reward,Q-Learning; Markov Decision Process,https://en.wikipedia.org/wiki/Reinforcement_learning
