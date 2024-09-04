@@ -44,7 +44,7 @@ def process_images_tool(question_type,question,history,image_url=None):
    return (response.data[0].url,question_type)
 
 
-def process_image_descride_tool(question_type,question,history,image_url=None):
+def process_image_describe_tool(question_type,question,history,image_url=None):
     if question is None:
         question ="描述这个图片"
         
@@ -170,9 +170,9 @@ QUESTION_TO_FUNCTION = {
     userPurposeType.ImageGeneration: process_images_tool,
     userPurposeType.Audio :process_audio_tool,
     userPurposeType.InternetSearch : process_InternetSearch_tool,
-    userPurposeType.ImageDescride:  process_image_descride_tool,
+    userPurposeType.ImageDescribe:  process_image_describe_tool,
     userPurposeType.PPT:process_ppt_tool,
-    userPurposeType.Video:process_text_video_tool,
+    userPurposeType.Video: process_text_video_tool,
 }
 
 
