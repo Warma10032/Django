@@ -7,7 +7,7 @@ from qa.purpose_type import userPurposeType
 from icecream import ic
 
 
-def parse_question(question: str,iamge_url) -> userPurposeType:
+def parse_question(question: str,image_url) -> userPurposeType:
 
     if "文献" in question :
         return purpose_map["基于文件描述"]
@@ -19,10 +19,7 @@ def parse_question(question: str,iamge_url) -> userPurposeType:
     prompt = get_question_parser_prompt(question)
     response = Clientfactory().get_client().chat_with_ai(prompt)
     print(response)
-    # 这里暂时还没有实现其他意图的功能,暂时全部设置成其他类型
-    #防止问题是空，但是有图片这种情况
-    if image_url is not None:
-        return purpose_map["图片描述"]
+
     if response == "图片生成":
         return purpose_map["图片生成"]
     if  response =="视频生成":
@@ -31,9 +28,9 @@ def parse_question(question: str,iamge_url) -> userPurposeType:
          return purpose_map["PPT生成"]
     if response == "音频生成":
         return purpose_map["音频生成"]
-      
-    purpose_type = purpose_map["其他"]
-    return purpose_type
+    if response == "文本生成":
+        return purpose_map["其他"]
+    return purpose_map["其他"]
 
 
 

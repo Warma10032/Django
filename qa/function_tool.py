@@ -28,13 +28,13 @@ def process_unknown_tool(question_type : userPurposeType,
 
 # 处理RAG问题
 def RAG_tool(question_type : userPurposeType,
-             question : str,history:List[List | None]=None，image_url=None):
+             question : str,history:List[List | None]=None, image_url=None):
     # 先利用question去检索得到docs
     response = rag_chain.invoke(question,history)
     return (response,question_type)
 
 # 处理ImageGeneration问题的函数
-def process_images_tool(question_type,question,history，image_url=None):
+def process_images_tool(question_type,question,history,image_url=None):
    client=Clientfactory.get_special_client(client_type=question_type)
    response = client.images.generations(
        model="cogview-3",  # 填写需要调用的模型编码
@@ -47,6 +47,7 @@ def process_images_tool(question_type,question,history，image_url=None):
 def process_image_descride_tool(question_type,question,history,image_url=None):
     if question is None:
         question ="描述这个图片"
+        
     img_path = image_url
     client = Clientfactory.get_special_client(client_type=question_type)
     if is_file_path(img_path):
@@ -136,18 +137,10 @@ def process_text_video_tool(question_type,question,history,image_url=None):
     return (None,question_type)
 
 
-QUESTION_TO_FUNCTION = {
-    userPurposeType.Unknown: process_unknown_tool,
-    userPurposeType.ImageGeneration: process_images_tool,
-    userPurposeType.ImageDescride:  process_image_descride_tool,
-    userPurposeType.Audio:process_text_video_tool,
-    userPurposeType.PPT:process_ppt_tool,
-    userPurposeType.Ducument : RAG_tool,
-    userPurposeType.Audio :process_audio_tool
-}
+
 # 处理audio问题的函数
 def process_audio_tool(question_type : userPurposeType,
-             question : str,history:List[List | None]=None，image_url=None):
+             question : str,history:List[List | None]=None,image_url=None):
     # 先让大语言模型生成需要转换成语音的文字
     text = extract_text(question, history)
     # 判断需要生成哪种语言（东北、陕西、粤...）
@@ -176,7 +169,10 @@ QUESTION_TO_FUNCTION = {
     userPurposeType.Ducument : RAG_tool,
     userPurposeType.ImageGeneration: process_images_tool,
     userPurposeType.Audio :process_audio_tool,
-    userPurposeType.InternetSearch : process_InternetSearch_tool
+    userPurposeType.InternetSearch : process_InternetSearch_tool,
+    userPurposeType.ImageDescride:  process_image_descride_tool,
+    userPurposeType.PPT:process_ppt_tool,
+    userPurposeType.Video:process_text_video_tool,
 }
 
 
