@@ -8,4 +8,4 @@ migrations/
 flagged/
 project/settings.py
 
-/data/cache/audio
+data/cache/
