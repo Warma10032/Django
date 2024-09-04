@@ -7,8 +7,9 @@ from rag import rag_chain
 
 from audio.audio_extract import extract_text,extract_language,\
 extract_gender,get_tts_model_name
-
 from audio.audio_generate import audio_generate
+
+from Internet.Internet_chain import InternetSearchChain
 
 # 处理Unkown问题的函数
 def process_unknown_tool(question_type : userPurposeType,
@@ -55,11 +56,19 @@ def process_audio_tool(question_type : userPurposeType,
         audio_file = audio_generate("未找到合适的语音模型，将用普通话回复" + text, model_name)
     return((audio_file, "语音"),userPurposeType.Audio)
 
+# 处理联网搜索问题的函数
+def process_InternetSearch_tool(question_type : userPurposeType,
+             question : str,history:List[List | None]=None):
+    response =InternetSearchChain(question,history)
+    return (response,question_type)
+    
+
 QUESTION_TO_FUNCTION = {
     userPurposeType.Unknown : process_unknown_tool,
     userPurposeType.Ducument : RAG_tool,
     userPurposeType.ImageGeneration: process_images_tool,
-    userPurposeType.Audio :process_audio_tool
+    userPurposeType.Audio :process_audio_tool,
+    userPurposeType.InternetSearch : process_InternetSearch_tool
 }
 
 

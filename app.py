@@ -19,7 +19,7 @@ def grodio_chat_view(message,history):
         print(answer)
 
         # Unknown
-        if answer[1] == userPurposeType.Unknown or answer[1] == userPurposeType.Ducument:
+        if answer[1] == userPurposeType.Unknown or answer[1] == userPurposeType.Ducument or answer[1] == userPurposeType.InternetSearch:
             for chunk in answer[0]:
                 partial_message = partial_message + (chunk.choices[0].delta.content or "")
                 yield partial_message

@@ -9,6 +9,7 @@ class userPurposeType(Enum):
     ImageDescride = 4 #图生文
     Ducument = 5  #基于文件描述，后面有个向量库，对于单个用户，尽量从向量数据库给出回答，可能涉及检索加强
     Hello = 6   #问候语，给出特定输出
+    InternetSearch = 7 #网络搜索
 
     
 purpose_map={
@@ -19,5 +20,6 @@ purpose_map={
 "图片生成":userPurposeType.ImageGeneration,
 "基于文件描述":userPurposeType.Ducument,
 "问候语":userPurposeType.Hello,
+"网络搜索":userPurposeType.InternetSearch
 }
 

@@ -9,7 +9,7 @@ from env import get_app_root
 
 from langchain_community.embeddings import ModelScopeEmbeddings
 
-from langchain_core.vectorstores import VectorStoreRetriever,VST
+from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_community.document_loaders import DirectoryLoader, PyPDFLoader, JSONLoader, MHTMLLoader, TextLoader, CSVLoader
 from langchain_community.document_loaders import UnstructuredWordDocumentLoader, UnstructuredHTMLLoader, UnstructuredMarkdownLoader
 
@@ -26,13 +26,9 @@ class Retrievemodel(Modelbase):
 
         # 此处请自行改成下载embedding模型的位置
         self._embedding_model_path =r'C:/Users/16013/.cache/modelscope/hub/iic/nlp_corom_sentence-embedding_chinese-base'
-        self._pdf_loader = PyPDFLoader # 先做成本地pdf加载，后续添加网页加载功能
-        self._docx_loader = UnstructuredWordDocumentLoader
         self._text_splitter = RecursiveCharacterTextSplitter
         #self._embedding = OpenAIEmbeddings()
         self._embedding = ModelScopeEmbeddings(model_id=self._embedding_model_path)
-        self._pdf_data_path = os.path.join(get_app_root(), "data/retriever/pdf")
-        self._docx_data_path = os.path.join(get_app_root(), "data/retriever/docx/大模型百科.docx")
         self._data_path = os.path.join(get_app_root(), "data/retriever")
         
         #self._logger: Logger = Logger("rag_retriever")
