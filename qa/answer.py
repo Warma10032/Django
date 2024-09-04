@@ -7,7 +7,7 @@ from qa.purpose_type import userPurposeType
 
 
 def get_answer(question: str,
-               history: List[List | None] = None) -> (
+               history: List[List | None] = None,image_url=None) -> (
         Tuple[Any, userPurposeType]):
     """
     根据问题获取答案或者完成任务
@@ -19,17 +19,19 @@ def get_answer(question: str,
     question_type = parse_question(question)
     print(question_type)
 
+
     
 
     # entities = check_entity(question)
 
     function = map_question_to_function(question_type)
-    print(function)
     # args_getter = map_question_to_function_args(question_type)
     # args = args_getter([question_type, question, history, entities])
+    print(function)
 
-    args = [question_type,question,history]
 
+
+    args = [question_type,question,history,image_url]
     result = function(*args)
 
     # # 如果上面的代码不行则直接默认问题类型为unknown,就用chat解决

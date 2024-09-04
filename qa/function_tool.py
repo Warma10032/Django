@@ -1,16 +1,22 @@
-from typing import Callable,List
-
+import base64
+from typing import Callable,List,Dict,Tuple
+import time
+import json
 from client.clientfactory import Clientfactory
+from zhipuai import ZhipuAI
 from qa.purpose_type import userPurposeType
+from pathlib import Path
+from ppt.ppt_generation import generate as generate_ppt
+from ppt.ppt_content import generate_ppt_content
+def is_file_path(path):
+    return Path(path).exists()
 
 # 处理Unkown问题的函数
-def process_unknown_tool(question_type,question,history):
+def process_unknown_tool(question_type,question,history,image_url=None):
     response = Clientfactory().get_client().chat_with_ai_stream(question,history)
     return (response,question_type)
 
-def process_images_tool(question_type,question,history):
-   print(1)
-   print(question_type)
+def process_images_tool(question_type,question,history,image_url=None):
    client=Clientfactory.get_special_client(client_type=question_type)
    response = client.images.generations(
        model="cogview-3",  # 填写需要调用的模型编码
@@ -20,16 +26,118 @@ def process_images_tool(question_type,question,history):
    print(response.data[0].url)
    return (response.data[0].url,question_type)
 
+def process_image_descride_tool(question_type,question,history,image_url=None):
+    img_path = image_url
+    client = Clientfactory.get_special_client(client_type=question_type)
+    if is_file_path(img_path):
+     with open(img_path, 'rb') as img_file:
+        img_base = base64.b64encode(img_file.read()).decode('utf-8')
+        response = client.chat.completions.create(
+              model="glm-4v-plus",
+             messages=[
+               {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": img_base
+                        }
+                    },
+                    {
+                        "type": "text",
+                        "text": question
+                    }
+                          ]
+                }
+                     ]
+          )
+     return (response.choices[0].message.content,question_type)
+    else:
+        response = client.chat.completions.create(
+            model="glm-4v-plus",  # 填写需要调用的模型名称
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": image_url
+                            }
+                        },
+                        {
+                            "type": "text",
+                            "text": "图里有什么"
+                        }
+                    ]
+                }
+            ]
+        )
+        return (response.choices[0].message.content, question_type)
+
+def process_ppt_tool( question_type,question: str,history: List[List[str] | None] = None,image_url=None) -> Tuple[Tuple[str, str], userPurposeType]:
+    raw_text: str = generate_ppt_content(question, history)
+    ppt_content = json.loads(raw_text)
+    ppt_file: str = generate_ppt(ppt_content)
+    return (ppt_file, "ppt"), userPurposeType.PPT
+
+
+
+
+
+
+def process_text_video_tool(question_type,question,history,image_url=None):
+    client = Clientfactory.get_special_client(client_type=question_type)
+    chatRequest = client.videos.generations(
+        model="cogvideox",
+        prompt=question,
+    )
+    print(chatRequest)
+
+    start_time = time.time()  # 开始计时
+    video_url = None
+    timeout=120
+    while time.time() - start_time < timeout:
+        # 请求视频生成结果
+        print(chatRequest.id)
+        response = client.videos.retrieve_videos_result(
+            id=chatRequest.id
+        )
+
+        # 检查任务状态是否成功
+        if response.task_status == 'SUCCESS' and response.video_result:
+            video_url = response.video_result[0].url
+            print("视频URL:", video_url)
+            return ((video_url,"视频"),question_type)
+        else:
+            print("任务未完成，正在等待...")
+
+        # 等待一段时间再请求
+        time.sleep(2)  # 每次请求后等待2秒再继续
+
+
+    return (None,question_type)
+
+
+
+
+
+
+
+
 QUESTION_TO_FUNCTION = {
     userPurposeType.Unknown: process_unknown_tool,
-    userPurposeType.ImageGeneration: process_images_tool
+    userPurposeType.ImageGeneration: process_images_tool,
+    userPurposeType.ImageDescride:  process_image_descride_tool,
+    userPurposeType.Audio:process_text_video_tool,
+    userPurposeType.PPT:process_ppt_tool,
 }
 
 
 # 根据用户不同的意图选择不同的函数
 def map_question_to_function(purpose : userPurposeType) -> Callable:
     if purpose in QUESTION_TO_FUNCTION:
-        print (QUESTION_TO_FUNCTION[purpose])
         return QUESTION_TO_FUNCTION[purpose]
     else :
         raise ValueError('没有找到意图对应的函数')
