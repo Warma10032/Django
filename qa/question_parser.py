@@ -1,8 +1,13 @@
+from typing import List
+
 from client.clientfactory import Clientfactory
 
 from qa.prompt_templates import get_question_parser_prompt
 from qa.purpose_type import purpose_map
 from qa.purpose_type import userPurposeType
+
+from model.KG.search_service import search
+from model.KG.search_model import _Value
 
 from icecream import ic
 
@@ -28,4 +33,9 @@ def parse_question(question: str) -> userPurposeType:
 
 
 
-    
+def check_entity(question:str) -> List[_Value]|None:
+    code,result = search(question)
+    if code == 0:
+        return result
+    else:
+        return None

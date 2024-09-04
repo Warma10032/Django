@@ -1,4 +1,4 @@
-from typing import Callable,List
+from typing import Callable,List,Tuple
 
 from client.clientfactory import Clientfactory
 from qa.purpose_type import userPurposeType
@@ -9,6 +9,28 @@ from audio.audio_extract import extract_text,extract_language,\
 extract_gender,get_tts_model_name
 
 from audio.audio_generate import audio_generate
+from kg.Graph import GraphDao
+
+from qa.purpose_type import userPurposeType
+from model.KG.search_model import _Value
+
+_dao = GraphDao()
+
+def relation_tool(entities: List[_Value] | None) -> str:
+    if not entities or len(entities) < 2:
+        return None
+    relationship_match = _dao.query_relationship_by_2person_name(entities[0].name, entities[1].name)
+    if relationship_match:
+
+        rel = relationship_match[0]['type(r)']
+        if entities[0].name not in rel:
+            start_name = entities[0].name
+        else:
+            start_name = entities[1].name
+
+        #，详见:{relationship_match[0]['r']['Notes']}
+        return f"关系如下：{rel}"
+
 
 # 处理Unkown问题的函数
 def process_unknown_tool(question_type : userPurposeType,

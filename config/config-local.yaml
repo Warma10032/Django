@@ -1,0 +1,21 @@
+cache:
+  node:
+    fields:
+      - PersonId
+      - name
+      - labels
+  async: thread
+model:
+  graph-entity:
+    search-key: name
+  embedding:
+    model-name: C:/Users/李衍铭/.cache/modelscope/hub/iic/nlp_corom_sentence-embedding_chinese-base
+    device: cpu
+
+database:
+  neo4j:
+    url: bolt://localhost:7687
+    database: neo4j
+    username: neo4j
+    # 注意数字用引号括起来
+    password: "12345678"

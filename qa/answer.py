@@ -4,7 +4,8 @@ from typing import Tuple, List, Any
 from qa.function_tool import map_question_to_function
 from qa.question_parser import parse_question
 from qa.purpose_type import userPurposeType
-
+from qa.question_parser import check_entity
+from qa.function_tool import relation_tool
 
 def get_answer(question: str,
                history: List[List | None] = None) -> (
@@ -19,9 +20,12 @@ def get_answer(question: str,
     question_type = parse_question(question)
     print(question_type)
 
-    
+    # 此处在使用知识图谱之前，需先检查问题的实体
+    entities = check_entity(question)
+    kg_info = relation_tool(entities)
 
-    # entities = check_entity(question)
+    if kg_info is not None:
+         question = f'{question}\n从知识图谱中检索到的信息如下{kg_info}\n请你基于知识图谱的信息去回答,并给出知识图谱检索到的信息'
 
     function = map_question_to_function(question_type)
     print(function)
@@ -29,7 +33,6 @@ def get_answer(question: str,
     # args = args_getter([question_type, question, history, entities])
 
     args = [question_type,question,history]
-
     result = function(*args)
 
     # # 如果上面的代码不行则直接默认问题类型为unknown,就用chat解决
