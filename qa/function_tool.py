@@ -10,7 +10,6 @@ from ppt.ppt_generation import generate as generate_ppt
 from ppt.ppt_content import generate_ppt_content
 def is_file_path(path):
     return Path(path).exists()
-
 # 处理Unkown问题的函数
 def process_unknown_tool(question_type,question,history,image_url=None):
     response = Clientfactory().get_client().chat_with_ai_stream(question,history)
@@ -27,6 +26,8 @@ def process_images_tool(question_type,question,history,image_url=None):
    return (response.data[0].url,question_type)
 
 def process_image_descride_tool(question_type,question,history,image_url=None):
+    if question is None:
+        question ="描述这个图片"
     img_path = image_url
     client = Clientfactory.get_special_client(client_type=question_type)
     if is_file_path(img_path):
@@ -46,7 +47,7 @@ def process_image_descride_tool(question_type,question,history,image_url=None):
                     },
                     {
                         "type": "text",
-                        "text": question
+                        "text": question+"不要描述无关内容，比如AI生成这种提示语"
                     }
                           ]
                 }
@@ -68,7 +69,7 @@ def process_image_descride_tool(question_type,question,history,image_url=None):
                         },
                         {
                             "type": "text",
-                            "text": "图里有什么"
+                            "text": "图里有什么？不要描述一些无关的内容，比如AI生成这种提示语"
                         }
                     ]
                 }
@@ -79,12 +80,8 @@ def process_image_descride_tool(question_type,question,history,image_url=None):
 def process_ppt_tool( question_type,question: str,history: List[List[str] | None] = None,image_url=None) -> Tuple[Tuple[str, str], userPurposeType]:
     raw_text: str = generate_ppt_content(question, history)
     ppt_content = json.loads(raw_text)
-    ppt_file: str = generate_ppt(ppt_content)
+    ppt_file: str = generate_ppt(ppt_content) #这个语句由于模型能力有限，可能不会按照格式输出，会导致冲突，要用str正则语句修改，删除一些异常符号，否则会出bug
     return (ppt_file, "ppt"), userPurposeType.PPT
-
-
-
-
 
 
 def process_text_video_tool(question_type,question,history,image_url=None):
@@ -111,19 +108,13 @@ def process_text_video_tool(question_type,question,history,image_url=None):
             print("视频URL:", video_url)
             return ((video_url,"视频"),question_type)
         else:
-            print("任务未完成，正在等待...")
+            print("任务未完成，请等待...")
 
         # 等待一段时间再请求
         time.sleep(2)  # 每次请求后等待2秒再继续
 
 
     return (None,question_type)
-
-
-
-
-
-
 
 
 QUESTION_TO_FUNCTION = {

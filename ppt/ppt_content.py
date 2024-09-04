@@ -57,7 +57,7 @@ def __construct_messages(question: str, history: List[List | None]) -> List[Dict
 
     return messages
 
-
+#生成ppt的文字内容，并对格式进行检查修改
 def generate_ppt_content(question: str,
                          history: List[List | None] | None = None) -> str:
     messages = __construct_messages(question, history or [])
@@ -66,7 +66,24 @@ def generate_ppt_content(question: str,
     print(result)
     print(type(result))
 
-    #result = re.sub(r'\bjson\b', '', result)
-    result = re.sub(r'\b`\b','',result)
+    result = re.sub(r'\bjson\b', '', result)
+    result = re.sub(r'`','',result)
+
+    index_of_last = result.rfind('"')
+    total_result=None
     print(result)
-    return result
+
+    if index_of_last!= -1 and result[index_of_last + 1:] == '}]}]}':
+        # 如果已经是正确的，则不做任何改变
+        total_result = result
+        print(total_result)
+        return total_result
+    else:
+        total_result = result[:index_of_last + 1] + '}]}]}'
+        print(total_result)
+        return total_result
+
+
+
+
+

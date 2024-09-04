@@ -16,7 +16,7 @@ def get_answer(question: str,
     :return:
     """
     # 判断问题类型，选择不同的函数
-    question_type = parse_question(question)
+    question_type = parse_question(question,image_url)
     print(question_type)
 
 
