@@ -16,8 +16,6 @@ def stream_output(text, chunk_size=5):
 
 
 # 核心函数
-
-
 def grodio_chat_view(message, history, image):
     ic(message)
     ic(history)
@@ -28,7 +26,7 @@ def grodio_chat_view(message, history, image):
     else:
         answer = get_answer(message, history)
     ic("模型回答：", answer)
-    
+
     partial_message = ""
     # 处理文本生成/其他/文档检索
     if answer[1] == userPurposeType.Unknown or answer[1] == userPurposeType.Document:
@@ -64,16 +62,23 @@ def grodio_chat_view(message, history, image):
     if answer[1] == userPurposeType.Video:
         if answer[0] is not None:
             yield answer[0]
-    # 处理
+    # 处理PPT
     if answer[1] == userPurposeType.PPT:
         yield answer[0]
-
+    # 处理音频生成
     if answer[1] == userPurposeType.Audio:
         yield answer[0]
-        
+    # 处理联网搜索
     if answer[1] == userPurposeType.InternetSearch:
-        if answer[2]==False:
-           partial_message="由于网络问题，访问互联网失败，下面由我根据现有知识给出回答："     
+        if answer[3] == False:
+            partial_message = (
+                "由于网络问题，访问互联网失败，下面由我根据现有知识给出回答："
+            )
+        else:
+            # 将字典中的内容转换为 Markdown 格式的链接
+            links = "\n".join(f"[{title}]({link})" for link, title in answer[2].items())
+            links += "\n"
+            partial_message = f"参考资料：{links}"
         for chunk in answer[0]:
             partial_message = partial_message + (chunk.choices[0].delta.content or "")
             yield partial_message
@@ -82,7 +87,9 @@ def grodio_chat_view(message, history, image):
 # textbox=gr.Textbox(placeholder="请输入你的问题", container=False, scale=7),  # 输入框配置
 interface = gr.ChatInterface(
     fn=grodio_chat_view,
-    chatbot=gr.Chatbot(height=400, avatar_images=AVATAR, show_copy_button=True),  # 聊天机器人配置
+    chatbot=gr.Chatbot(
+        height=400, avatar_images=AVATAR, show_copy_button=True
+    ),  # 聊天机器人配置
     textbox=gr.Textbox(
         placeholder="请输入你的问题", container=False, scale=7
     ),  # 输入框配置
@@ -100,7 +107,7 @@ interface = gr.ChatInterface(
         ["请用粤语朗诵一下 鹅、鹅、鹅，曲项向天歌。白毛浮绿水，红掌拨清波"],
         ["根据文献帮我快速入门git"],
         ["描述这张图片"],
-        ["根据搜索，介绍一下东南大学"],
+        ["搜索一下最新新闻"],
     ],
     cache_examples=False,  # 是否缓存示例输入
     retry_btn=None,  # 重试按钮的配置py
