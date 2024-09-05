@@ -1,7 +1,7 @@
 import gradio as gr
 from qa.answer import get_answer
 from qa.function_tool import process_image_describe_tool
-
+import speech_recognition as  sr
 from qa.purpose_type import userPurposeType
 
 from client.LLMclientgeneric import LLMclientgeneric
@@ -15,10 +15,31 @@ def stream_output(text, chunk_size=5):
         yield text[i : i + chunk_size]
 
 
+def audio_to_text(audio_file_path):
+        # 创建识别器对象
+        recognizer = sr.Recognizer()
+        try:
+            # 使用 AudioFile 打开音频文件
+            with sr.AudioFile(audio_file_path) as source:
+                # 读取音频文件数据
+                audio_data = recognizer.record(source)
+                # 使用 Google Web Speech API 进行语音识别
+                text = recognizer.recognize_google(audio_data, language="zh-CN")  # 使用中文
+                return text
+        except sr.UnknownValueError:
+            return "语音解析出错了"
+        except sr.RequestError as e:
+            return f" 谷歌演讲API拒绝您的请求   "
+
 # 核心函数
 
-
-def grodio_chat_view(message, history, image):
+def grodio_chat_view(message, history, image,audio):
+     #将语音输入转化为文本
+    if audio is not None:
+        if len(message)>0:
+              message=audio_to_text(audio)+message
+        else:
+              message =audio_to_text(audio)
     ic(message)
     ic(history)
 
@@ -92,15 +113,15 @@ interface = gr.ChatInterface(
     description="你的健康小助手",  # 聊天界面的描述
     theme="default",  # 主题
     examples=[
-        ["您好"],
-        ["你会写代码吗"],
-        ["给我一个健身计划"],
-        ["帮我生成一张老人练太极图片"],
-        ["帮我生成一段老人打太极的视频"],
-        ["请用粤语朗诵一下 鹅、鹅、鹅，曲项向天歌。白毛浮绿水，红掌拨清波"],
-        ["根据文献帮我快速入门git"],
-        ["描述这张图片"],
-        ["根据搜索，介绍一下东南大学"],
+         ["您好"],
+	     ["我想了解糖尿病相关知识？"],
+	     ["糖尿病人适合吃的食物有哪些？"],
+	     ["糖尿病的常见症状有哪些？"],
+         ["帮我生成一份有关糖尿病发病原因丶症状丶治疗药物丶预防措施的PPT"],
+         ["请根据我给的就诊信息单，给我一个合理化饮食建议"],
+         ["我最近想打太极养生，帮我生成一段老人打太极的视频吧"],
+         ["请用粤语朗诵一下 鹅鹅鹅，曲项向天歌。白毛浮绿水，红掌拨清波"],
+         ["根据文献帮我快速入门git"],
     ],
     cache_examples=False,  # 是否缓存示例输入
     retry_btn=None,  # 重试按钮的配置py
