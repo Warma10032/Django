@@ -33,6 +33,8 @@ def parse_question(question: str,image_url) -> userPurposeType:
          return purpose_map["PPT生成"]
     if response == "音频生成":
         return purpose_map["音频生成"]
+    if response == "图片描述":
+        return purpose_map["图片描述"]
     if response == "文本生成":
         return purpose_map["其他"]
     return purpose_map["其他"]

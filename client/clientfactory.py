@@ -1,5 +1,5 @@
 from client.ourAPI.client import OurAPI
-from client.zhipuAPI.client import Image_client, Image_descride_client
+from client.zhipuAPI.client import Image_client, Image_describe_client
 from client.zhipuAPI.client import Video_client
 from env import get_env_value
 from qa.purpose_type import userPurposeType
@@ -34,8 +34,8 @@ class Clientfactory:
             return Image_client
         if client_type == userPurposeType.Unknown:
             return OurAPI()
-        if client_type == userPurposeType.ImageDescride:
-            return Image_descride_client
+        if client_type == userPurposeType.ImageDescribe:
+            return Image_describe_client
         if client_type == userPurposeType.Audio:
             print(8)
             return Video_client
