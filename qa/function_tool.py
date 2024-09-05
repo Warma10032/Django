@@ -32,7 +32,7 @@ _dao = GraphDao()
 
 def relation_tool(entities: List[_Value] | None) -> str | None:
     if not entities or len(entities) == 0:
-        return "未提供任何实体。"
+        return None
     
     relationships = set()  # 使用集合来避免重复关系
     relationship_match=[]
@@ -44,13 +44,13 @@ def relation_tool(entities: List[_Value] | None) -> str | None:
         # 查询每个实体与其他实体的关系
         relationship_match.append(_dao.query_relationship_by_person_name(entity_name)) 
         
-    for record in relationship_match:
+    for record in relationship_match[0]:
         # 获取起始节点和结束节点的名称
-        start_name = record[0]['r'].start_node['name']
-        end_name = record[0]['r'].end_node['name']
+        start_name = record['r'].start_node['name']
+        end_name = record['r'].end_node['name']
         
         # 获取关系类型
-        rel = type(record[0]['r']).__name__  # 获取关系的类名，比如 CAUSES
+        rel = type(record['r']).__name__  # 获取关系的类名，比如 CAUSES
         
         # # 获取关系的备注信息，假设关系中可能有一个 'Notes' 属性
         # notes = getattr(record['r'], 'Notes', '无')
