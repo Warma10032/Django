@@ -32,7 +32,7 @@ def grodio_chat_view(message,history,image):
 
 
        #处理文本生成/其他/文档检索
-        if answer[1] == userPurposeType.Unknown or answer[1] == userPurposeType.Ducument:
+        if answer[1] == userPurposeType.Unknown or answer[1] == userPurposeType.Document:
             for chunk in answer[0]:
                 partial_message = partial_message + (chunk.choices[0].delta.content or "")
                 yield partial_message

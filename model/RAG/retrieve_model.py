@@ -30,7 +30,7 @@ class Retrievemodel(Modelbase):
 
         # 此处请自行改成下载embedding模型的位置
         self._embedding_model_path = Config.get_instance().get_with_nested_params("model", "embedding", "model-name")
-        self._loader = PyPDFDirectoryLoader # 先做成本地pdf加载，后续添加网页加载功能
+        #self._loader = PyPDFDirectoryLoader # 先做成本地pdf加载，后续添加网页加载功能
         self._text_splitter = RecursiveCharacterTextSplitter
         #self._embedding = OpenAIEmbeddings()
         self._embedding = ModelScopeEmbeddings(model_id=self._embedding_model_path)
