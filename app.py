@@ -1,6 +1,6 @@
 import gradio as gr
 from qa.answer import get_answer
-from qa.function_tool import process_image_descride_tool
+from qa.function_tool import process_image_describe_tool
 
 from qa.purpose_type import userPurposeType
 
@@ -39,7 +39,7 @@ def grodio_chat_view(message,history,image):
         #处理图片生成        
         if answer[1] == userPurposeType.ImageGeneration:
                 image_url = answer[0]
-                world=process_image_descride_tool(question_type=userPurposeType.ImageDescride, question="描述这个图片", history=" ", image_url=image_url)
+                world=process_image_describe_tool(question_type=userPurposeType.ImageDescride, question="描述这个图片", history=" ", image_url=image_url)
                 combined_message = f'''
                              <div>
                                  <p>生成的图片：</p>
