@@ -111,4 +111,4 @@ interface = gr.ChatInterface(
     concurrency_limit=4,  # 并发限制cd
 )
 
-interface.launch()
+interface.launch(share=True)

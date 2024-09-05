@@ -20,7 +20,7 @@ class NodeEntities(object):
         #     raise ValueError("没有找到元数据节点，请先创建元数据节点")
 
         # 定义你要查询的标签类型，比如疾病、症状、药物等
-        labels_to_query = ['Disease', 'Symptom', 'Medication']
+        labels_to_query = ['Disease', 'Symptom', 'Check',"Department","Treatment"]
 
         node_list = []
 
