@@ -1,4 +1,4 @@
-from typing import List
+from typing import List,Dict
 
 from client.clientfactory import Clientfactory
 
@@ -41,7 +41,7 @@ def parse_question(question: str,image_url) -> userPurposeType:
 
 
 
-def check_entity(question:str) -> List[_Value]|None:
+def check_entity(question:str) -> List[Dict]:
     code,result = search(question)
     if code == 0:
         return result
