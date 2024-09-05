@@ -1,9 +1,7 @@
 from client.clientfactory import Clientfactory
-
 from qa.prompt_templates import get_question_parser_prompt
 from qa.purpose_type import purpose_map
 from qa.purpose_type import userPurposeType
-
 from icecream import ic
 
 
@@ -19,14 +17,16 @@ def parse_question(question: str,image_url) -> userPurposeType:
     prompt = get_question_parser_prompt(question)
     response = Clientfactory().get_client().chat_with_ai(prompt)
     print(response)
-
-    if response == "图片生成":
+    print(question)
+    if image_url is not None :
+        return purpose_map["图片描述"]
+    if response == "图片生成" and len(question) >0:
         return purpose_map["图片生成"]
-    if  response =="视频生成":
+    if  response =="视频生成" and len(question) >0:
         return purpose_map["视频生成"]
-    if  response =="PPT生成":
+    if  response =="PPT生成" and len(question) >0:
          return purpose_map["PPT生成"]
-    if response == "音频生成":
+    if response == "音频生成" and len(question) >0:
         return purpose_map["音频生成"]
     if response == "文本生成":
         return purpose_map["其他"]

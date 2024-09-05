@@ -17,12 +17,19 @@ from audio.audio_generate import audio_generate
 def is_file_path(path):
     return Path(path).exists()
 
-
 from Internet.Internet_chain import InternetSearchChain
+
+
 
 # 处理Unkown问题的函数
 def process_unknown_tool(question_type : userPurposeType,
              question : str,history:List[List | None]=None,image_url=None):
+    print('unkonw')
+    if len(question)==0:
+        print("....")
+        question="请你输出：’抱歉我暂时无法识别您的问题，请您重新输入‘。不要输出其他多余信息"
+
+
     response = Clientfactory().get_client().chat_with_ai_stream(question,history)
     return (response,question_type)
 
@@ -35,7 +42,11 @@ def RAG_tool(question_type : userPurposeType,
 
 # 处理ImageGeneration问题的函数
 def process_images_tool(question_type,question,history,image_url=None):
-   client=Clientfactory.get_special_client(client_type=question_type)
+
+   print("images")
+
+   client = Clientfactory.get_special_client(client_type=question_type)
+
    response = client.images.generations(
        model="cogview-3",  # 填写需要调用的模型编码
        prompt=question,
@@ -46,12 +57,10 @@ def process_images_tool(question_type,question,history,image_url=None):
 
 def process_image_describe_tool(question_type,question,history,image_url=None):
     if question is None:
-        question ="描述这个图片"
-        
-    img_path = image_url
+        question ="描述这个图片，说明这个图片的主要内容"
     client = Clientfactory.get_special_client(client_type=question_type)
-    if is_file_path(img_path):
-     with open(img_path, 'rb') as img_file:
+    if is_file_path(image_url):
+     with open(image_url, 'rb') as img_file:
         img_base = base64.b64encode(img_file.read()).decode('utf-8')
         response = client.chat.completions.create(
               model="glm-4v-plus",
@@ -67,7 +76,7 @@ def process_image_describe_tool(question_type,question,history,image_url=None):
                     },
                     {
                         "type": "text",
-                        "text": question+"不要描述无关内容，比如AI生成这种提示语"
+                        "text": question
                     }
                           ]
                 }
@@ -89,7 +98,7 @@ def process_image_describe_tool(question_type,question,history,image_url=None):
                         },
                         {
                             "type": "text",
-                            "text": "图里有什么？不要描述一些无关的内容，比如AI生成这种提示语"
+                            "text": "图里有什么？说明图片的主要内容"
                         }
                     ]
                 }

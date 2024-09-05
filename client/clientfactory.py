@@ -34,7 +34,7 @@ class Clientfactory:
             return Image_client
         if client_type == userPurposeType.Unknown:
             return OurAPI()
-        if client_type == userPurposeType.ImageDescride:
+        if client_type == userPurposeType.ImageDescribe:
             return Image_descride_client
         if client_type == userPurposeType.Audio:
             print(8)
