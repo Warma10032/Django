@@ -7,6 +7,7 @@ import re
 import os
 import requests
 import shutil
+import threading
 from bs4 import BeautifulSoup
 from urllib3.exceptions import InsecureRequestWarning
 
@@ -23,11 +24,33 @@ def InternetSearchChain(question,history):
     question_list = re.split(r'[;；]', whole_question)
     
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-    
-    
+        
+    threads = []
+
+    # 为每个问题创建单独的线程
     for question in question_list:
-        search_bing(question, num_results=3)
-        search_baidu(question, num_results=3)
+        # 每个线程执行搜索操作
+        thread = threading.Thread(target=search_bing, args=(question, 3))
+        threads.append(thread)
+        thread.start()
+        thread = threading.Thread(target=search_baidu, args=(question, 3))
+        threads.append(thread)
+        thread.start()
+
+    # 等待所有线程完成
+    for thread in threads:
+        thread.join()
+    
+    if has_html_files(_SAVE_PATH):
+        docs,_context = retrieve_html(question) 
+        prompt = f"请根据搜索到的文件信息\n{_context}\n 回答问题：\n{question}"
+    else:
+        prompt = question
+    
+    response = Clientfactory().get_client().chat_with_ai_stream(prompt)
+
+    
+    return response, has_html_files(_SAVE_PATH)
     
     
     
@@ -126,3 +149,14 @@ def search_baidu(query, num_results=3):
             print("访问百度失败，请检查网络代理制")
     else:
         print("Error: ", response.status_code)
+
+
+def has_html_files(directory_path):
+    if os.path.exists(directory_path):
+        # 遍历目录中的文件
+        for file_name in os.listdir(directory_path):
+            if file_name.endswith(".html"):
+                return True
+        return False
+    else:
+        return False

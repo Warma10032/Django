@@ -35,10 +35,10 @@ class InternetModel(Modelbase):
     # 建立向量库
     def build(self):
         # 加载html文件
-        html_loader = DirectoryLoader(self._data_path, glob="**/*.html", loader_cls=UnstructuredHTMLLoader, silent_errors=True)
+        html_loader = DirectoryLoader(self._data_path, glob="**/*.html", loader_cls=UnstructuredHTMLLoader, silent_errors=True, use_multithreading=True)
         html_docs = html_loader.load()
         
-        mhtml_loader = DirectoryLoader(self._data_path, glob="**/*.mhtml", loader_cls=MHTMLLoader, silent_errors=True)
+        mhtml_loader = DirectoryLoader(self._data_path, glob="**/*.mhtml", loader_cls=MHTMLLoader, silent_errors=True, use_multithreading=True)
         mhtml_docs = mhtml_loader.load()
         
         
@@ -46,7 +46,7 @@ class InternetModel(Modelbase):
         docs =  html_docs + mhtml_docs
         
         # 创建一个 RecursiveCharacterTextSplitter 对象，用于将文档分割成块，chunk_size为最大块大小，chunk_overlap块之间可以重叠的大小
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=100)
         splits = text_splitter.split_documents(docs)
         
         # 使用 FAISS 创建一个向量数据库，存储分割后的文档及其嵌入向量
