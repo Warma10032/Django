@@ -126,27 +126,3 @@ def search_baidu(query, num_results=3):
             print("访问百度失败，请检查网络代理制")
     else:
         print("Error: ", response.status_code)
-
-
-    # 创建保存网页的文件夹
-    
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-    
-    for link in links:
-        try:
-            # 禁用 SSL 验证的警告
-            requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-            response = requests.get(link['link'], timeout=10)
-            if response.status_code == 200:
-                filename = f"{folder}/{link['title']}.html"
-                with open(filename, 'w', encoding='utf-8') as f:
-                    f.write(response.text)
-                print(f"Downloaded and saved: {link['link']} as {filename}")
-            else:
-                print(f"Failed to download {link['link']}: Status code {response.status_code}")
-        except Exception as e:
-            print(f"Error downloading {link['link']}: {e}")
-
-    
-    
