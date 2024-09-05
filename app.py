@@ -71,8 +71,6 @@ def grodio_chat_view(message, history, image):
     if answer[1] == userPurposeType.Audio:
         yield answer[0]
         
-
-
     if answer[1] == userPurposeType.InternetSearch:
         if answer[2]==False:
            partial_message="由于网络问题，访问互联网失败，下面由我根据现有知识给出回答："     

@@ -32,7 +32,7 @@ _dao = GraphDao()
 
 def relation_tool(entities: List[_Value] | None) -> str | None:
     if not entities or len(entities) == 0:
-        return "未提供任何实体。"
+        return None
     
     relationships = set()  # 使用集合来避免重复关系
     relationship_match=[]

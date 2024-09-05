@@ -23,11 +23,11 @@ class EntitySearcher(Modelbase):
     def build(self,*args,**kwargs):
         self._model_status = ModelStatus.BUILDING
 
-        # try:
-        self._build_model()
-        # except Exception as e:
-        #     self._model_status = ModelStatus.FAILED
-        #     return 
+        try:
+            self._build_model()
+        except Exception as e:
+            self._model_status = ModelStatus.FAILED
+            return 
          
         self._model_status = ModelStatus.READY
 
