@@ -227,8 +227,8 @@ def process_InternetSearch_tool(
     history: List[List | None] = None,
     image_url=None,
 ):
-    response, success = InternetSearchChain(question, history)
-    return (response, question_type, success)
+    response, links, success = InternetSearchChain(question, history)
+    return (response, question_type, links, success)
 
 
 QUESTION_TO_FUNCTION = {
