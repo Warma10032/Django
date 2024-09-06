@@ -110,7 +110,7 @@ def process_images_tool(question_type, question, history, image_url=None):
 
 def process_image_describe_tool(question_type, question, history, image_url=None):
     if question is None:
-        question = "描述这个图片"
+        question ="描述这个图片，说明这个图片的主要内容"
 
     img_path = image_url
     client = Clientfactory.get_special_client(client_type=question_type)
@@ -127,7 +127,7 @@ def process_image_describe_tool(question_type, question, history, image_url=None
                             {
                                 "type": "text",
                                 "text": question
-                                + "不要描述无关内容，比如AI生成这种提示语",
+                                
                             },
                         ],
                     }
@@ -144,7 +144,7 @@ def process_image_describe_tool(question_type, question, history, image_url=None
                         {"type": "image_url", "image_url": {"url": image_url}},
                         {
                             "type": "text",
-                            "text": "图里有什么？不要描述一些无关的内容，比如AI生成这种提示语",
+                            "text": "图里有什么？请描述图里的主要内容",
                         },
                     ],
                 }
