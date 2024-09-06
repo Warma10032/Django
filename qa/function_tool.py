@@ -30,40 +30,43 @@ from model.KG.search_model import _Value
 
 _dao = GraphDao()
 
-def relation_tool(entities: List[_Value] | None) -> str | None:
+
+def relation_tool(entities: List[Dict] | None) -> str | None:
     if not entities or len(entities) == 0:
         return None
-    
+
     relationships = set()  # 使用集合来避免重复关系
-    relationship_match=[]
-    
+    relationship_match = []
+
     # 遍历每个实体并查询与其他实体的关系
     for entity in entities:
-        entity_name = entity.name  
-        
+        entity_name = entity["name"]
+        if entity["label"] == "Disease":
+            for k, v in entity.items():
+                relationships.add(f"{entity_name} {k}: {v}")
+
         # 查询每个实体与其他实体的关系
-        relationship_match.append(_dao.query_relationship_by_person_name(entity_name)) 
-        
-    for record in relationship_match[0]:
-        # 获取起始节点和结束节点的名称
-        start_name = record['r'].start_node['name']
-        end_name = record['r'].end_node['name']
-        
-        # 获取关系类型
-        rel = type(record['r']).__name__  # 获取关系的类名，比如 CAUSES
-        
-        # # 获取关系的备注信息，假设关系中可能有一个 'Notes' 属性
-        # notes = getattr(record['r'], 'Notes', '无')
-        
-        # 构建关系字符串，打印或存储关系信息
-        print(f"{start_name} {rel} {end_name}")
+        relationship_match.append(_dao.query_relationship_by_person_name(entity_name))
 
-            
+    for i in range(len(relationship_match)):
+        for record in relationship_match[i]:
+            # 获取起始节点和结束节点的名称
+
+            start_name = record["r"].start_node["name"]
+            end_name = record["r"].end_node["name"]
+
+            # 获取关系类型
+            rel = type(record["r"]).__name__  # 获取关系的类名，比如 CAUSES
+
+            # # 获取关系的备注信息，假设关系中可能有一个 'Notes' 属性
+            # notes = getattr(record['r'], 'Notes', '无')
+
+            # 构建关系字符串，打印或存储关系信息
+            print(f"{start_name} {rel} {end_name}")
+
             # 构建关系字符串并添加到集合，确保不会重复添加
-        relationships.add(f"{start_name} {rel} {end_name}")
-    
+            relationships.add(f"{start_name} {rel} {end_name}")
 
-    
     # 返回关系集合的内容
     if relationships:
         return "；".join(relationships)
@@ -107,7 +110,7 @@ def process_images_tool(question_type, question, history, image_url=None):
 
 def process_image_describe_tool(question_type, question, history, image_url=None):
     if question is None:
-        question = "描述这个图片"
+        question ="描述这个图片，说明这个图片的主要内容"
 
     img_path = image_url
     client = Clientfactory.get_special_client(client_type=question_type)
@@ -124,7 +127,7 @@ def process_image_describe_tool(question_type, question, history, image_url=None
                             {
                                 "type": "text",
                                 "text": question
-                                + "不要描述无关内容，比如AI生成这种提示语",
+                                
                             },
                         ],
                     }
@@ -141,7 +144,7 @@ def process_image_describe_tool(question_type, question, history, image_url=None
                         {"type": "image_url", "image_url": {"url": image_url}},
                         {
                             "type": "text",
-                            "text": "图里有什么？不要描述一些无关的内容，比如AI生成这种提示语",
+                            "text": "图里有什么？请描述图里的主要内容",
                         },
                     ],
                 }
@@ -224,8 +227,8 @@ def process_InternetSearch_tool(
     history: List[List | None] = None,
     image_url=None,
 ):
-    response, success = InternetSearchChain(question, history)
-    return (response, question_type, success)
+    response, links, success = InternetSearchChain(question, history)
+    return (response, question_type, links, success)
 
 
 QUESTION_TO_FUNCTION = {

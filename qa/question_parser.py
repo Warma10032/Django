@@ -1,4 +1,4 @@
-from typing import List
+from typing import List,Dict
 
 from client.clientfactory import Clientfactory
 
@@ -25,23 +25,22 @@ def parse_question(question: str,image_url) -> userPurposeType:
     response = Clientfactory().get_client().chat_with_ai(prompt)
     print(response)
 
-    if response == "图片生成":
-        return purpose_map["图片生成"]
-    if  response =="视频生成":
-        return purpose_map["视频生成"]
-    if  response =="PPT生成":
-         return purpose_map["PPT生成"]
-    if response == "音频生成":
-        return purpose_map["音频生成"]
-    if response == "图片描述":
+    if image_url is not None :
         return purpose_map["图片描述"]
+    if response == "图片生成" and len(question) >0:
+        return purpose_map["图片生成"]
+    if  response =="视频生成" and len(question) >0:
+        return purpose_map["视频生成"]
+    if  response =="PPT生成" and len(question) >0:
+         return purpose_map["PPT生成"]
+    if response == "音频生成" and len(question) >0:
+        return purpose_map["音频生成"]
     if response == "文本生成":
         return purpose_map["其他"]
     return purpose_map["其他"]
 
 
-
-def check_entity(question:str) -> List[_Value]|None:
+def check_entity(question:str) -> List[Dict]:
     code,result = search(question)
     if code == 0:
         return result
