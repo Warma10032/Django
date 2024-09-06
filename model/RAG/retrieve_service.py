@@ -4,4 +4,7 @@ from model.RAG.retrieve_model import INSTANCE
 from langchain_core.documents import Document
 
 def retrieve(query:str) ->List[Document]:
-    return INSTANCE.retriever.invoke(query)
+    doc_user = INSTANCE.get_user_retriever().invoke(query)
+    doc_local = INSTANCE.retriever.invoke(query)
+    doc_all = doc_user + doc_local
+    return doc_all
