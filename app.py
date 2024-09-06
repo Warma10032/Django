@@ -18,7 +18,7 @@ def stream_output(text, chunk_size=5):
 # 核心函数
 
 
-def grodio_chat_view(message, history, image):
+def grodio_chat_view(message, history, image=None,file=None):
     ic(message)
     ic(history)
 
@@ -86,7 +86,11 @@ interface = gr.ChatInterface(
     textbox=gr.Textbox(
         placeholder="请输入你的问题", container=False, scale=7
     ),  # 输入框配置
-    additional_inputs=gr.Image(type="filepath", label="上传图像"),
+
+    additional_inputs=[
+        gr.Image(type="filepath", label="上传图像"),  # 上传图像功能
+        gr.File(label="上传知识库", type="filepath")  # 上传文件功能
+    ],
     additional_inputs_accordion_name="你的额外输入",
     title="「赛博华佗」📒",  # 聊天界面的标题
     description="你的健康小助手",  # 聊天界面的描述
@@ -111,4 +115,5 @@ interface = gr.ChatInterface(
     concurrency_limit=4,  # 并发限制cd
 )
 
-interface.launch()
+def start_gradio():
+     interface.launch(share=True)

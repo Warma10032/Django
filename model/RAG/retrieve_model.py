@@ -49,6 +49,7 @@ class Retrievemodel(Modelbase):
         # self._embedding = OpenAIEmbeddings()
         self._embedding = ModelScopeEmbeddings(model_id=self._embedding_model_path)
         self._data_path = os.path.join(get_app_root(), "data/retriever")
+        self._user_retrievers = {}
 
         # self._logger: Logger = Logger("rag_retriever")
 
@@ -163,6 +164,102 @@ class Retrievemodel(Modelbase):
             return self._retriever
         else:
             return self._retriever
+        
+    def build_user_vector_store(self):
+        """根据用户的ID加载用户文件夹中的文件并为用户构建向量库"""
+        user_data_path = os.path.join('user_data', self.user_id)  # 用户独立文件夹
+        if not os.path.exists(user_data_path):
+            print(f"用户文件夹 {user_data_path} 不存在")
+            return
 
+        try:
+            # 清理旧的向量库（如果已经存在）
+            if self.user_id in self._user_retrievers:
+                del self._user_retrievers[self.user_id]
+                print(f"用户 {self.user_id} 的旧向量库已删除")
+
+            # 加载用户文件夹中的文件并构建向量库
+            pdf_loader = DirectoryLoader(user_data_path, glob="**/*.pdf", loader_cls=PyPDFLoader, silent_errors=True)
+            pdf_docs = pdf_loader.load()
+
+            docx_loader = DirectoryLoader(user_data_path, glob="**/*.docx", loader_cls=UnstructuredWordDocumentLoader, silent_errors=True)
+            docx_docs = docx_loader.load()
+
+            docs = pdf_docs + docx_docs
+
+            if not docs:
+                print(f"用户 {self.user_id} 文件夹中没有找到文档")
+                return
+
+            text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=100)
+            splits = text_splitter.split_documents(docs)
+
+            # 为该用户构建向量库
+            vectorstore = FAISS.from_documents(documents=splits, embedding=self._embedding)
+            user_retriever = vectorstore.as_retriever(search_kwargs={"k": 6})
+
+            # 将用户的retriever存储到字典中
+            self._user_retrievers[self.user_id] = user_retriever
+            print(f"用户 {self.user_id} 的向量库已构建完成")
+
+        except Exception as e:
+            print(f"构建用户 {self.user_id} 向量库时出错: {e}")
+
+    def get_user_retriever(self) -> VectorStoreRetriever:
+        """获取用户的retriever，如果不存在则返回None"""
+        return self._user_retrievers.get(self.user_id, None)
+    
+
+    def upload_user_file(self, file):
+        """将用户上传的文件存储到用户的文件夹中"""
+        user_data_path = os.path.join('user_data', self.user_id)
+        os.makedirs(user_data_path, exist_ok=True)  # 确保用户文件夹存在
+
+        file_path = os.path.join(user_data_path, file.name)
+        with open(file_path, 'wb') as f:
+            f.write(file.read())
+
+        print(f"文件 {file.name} 已成功上传到用户 {self.user_id} 的文件夹")
+
+    # 展示用户已上传的文件
+    def list_uploaded_files(self):
+        """展示用户文件夹中已经上传的文件"""
+        user_data_path = os.path.join('user_data', self.user_id)
+        if not os.path.exists(user_data_path):
+            print(f"用户文件夹 {user_data_path} 不存在")
+            return []
+
+        files = os.listdir(user_data_path)
+        if files:
+            print(f"用户 {self.user_id} 已上传的文件：")
+            for file in files:
+                print(file)
+        else:
+            print(f"用户 {self.user_id} 文件夹为空")
+
+        return files
+
+    # 删除指定文件或清空用户文件夹
+    def delete_uploaded_file(self, filename=None):
+        """删除用户文件夹中的指定文件，或清空文件夹"""
+        user_data_path = os.path.join('user_data', self.user_id)
+        if not os.path.exists(user_data_path):
+            print(f"用户文件夹 {user_data_path} 不存在")
+            return
+
+        if filename:
+            file_path = os.path.join(user_data_path, filename)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                print(f"文件 {filename} 已成功删除")
+            else:
+                print(f"文件 {filename} 不存在")
+        else:
+            # 清空文件夹
+            for file in os.listdir(user_data_path):
+                file_path = os.path.join(user_data_path, file)
+                os.remove(file_path)
+            print(f"用户 {self.user_id} 文件夹已清空")
+    
 
 INSTANCE = Retrievemodel()

@@ -39,7 +39,7 @@ def relation_tool(entities: List[_Value] | None) -> str | None:
     
     # 遍历每个实体并查询与其他实体的关系
     for entity in entities:
-        entity_name = entity.name
+        entity_name = entity.name  
         
         # 查询每个实体与其他实体的关系
         relationship_match.append(_dao.query_relationship_by_person_name(entity_name)) 
