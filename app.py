@@ -90,6 +90,8 @@ def grodio_chat_view(message, history, image,audio):
     # 处理PPT
     if answer[1] == userPurposeType.PPT:
         yield answer[0]
+    if answer[1] == userPurposeType.Docx:
+        yield answer[0]
     # 处理音频生成
     if answer[1] == userPurposeType.Audio:
         yield answer[0]

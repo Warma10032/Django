@@ -42,6 +42,8 @@ def login(request):
     # 显示登录页面
     return render(request, 'login.html')
 
+
+
 # 选择页面视图
 def choice_view(request):
     if request.method == 'POST':
