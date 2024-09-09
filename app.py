@@ -122,7 +122,7 @@ interface = gr.ChatInterface(
     additional_inputs=[
         gr.Image(type="filepath", label="上传图像"),  # 上传图像功能
         gr.File(label="上传知识库", type="filepath")  # 上传文件功能
-	gr.Audio(type="filepath", label="语音输入"),  # 语音输入
+	gr.Audio(type="filepath", label="语音输入"),  # 语音输入功能
     ],
     additional_inputs_accordion_name="你的额外输入",
     title="「赛博华佗」📒",  # 聊天界面的标题
