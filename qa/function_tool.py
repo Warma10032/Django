@@ -81,6 +81,8 @@ def process_unknown_tool(
     history: List[List | None] = None,
     image_url=None,
 ):
+    if len(question)==0：
+    question=question="请你输出：对不起，我无法识别你的问题，请你重新输入问题"
     response = Clientfactory().get_client().chat_with_ai_stream(question, history)
     return (response, question_type)
 
