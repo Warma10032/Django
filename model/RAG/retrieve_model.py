@@ -27,6 +27,8 @@ from langchain_community.document_loaders import (
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores.faiss import FAISS
 
+from docx import Document
+
 from config.config import Config
 
 # r'C:/Users/16013/.cache/modelscope/hub/iic/nlp_corom_sentence-embedding_chinese-base'
@@ -260,6 +262,35 @@ class Retrievemodel(Modelbase):
                 file_path = os.path.join(user_data_path, file)
                 os.remove(file_path)
             print(f"用户 {self.user_id} 文件夹已清空")
+
+    def view_uploaded_file(self, filename):
+        """根据文件名查看用户文件内容"""
+        user_data_path = os.path.join('user_data', self.user_id)
+        file_path = os.path.join(user_data_path, filename)
+
+        if not os.path.exists(file_path):
+            print(f"文件 {filename} 不存在")
+            return None
+
+        # 根据文件类型选择不同的读取方式
+        if filename.endswith('.docx'):
+            try:
+                doc = Document(file_path)
+                file_content = "\n".join([para.text for para in doc.paragraphs])
+                print(f"文件 {filename} 内容已成功读取")
+                return file_content
+            except Exception as e:
+                print(f"读取文件 {filename} 时出错: {e}")
+                return None
+        else:
+            try:
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    file_content = file.read()
+                    print(f"文件 {filename} 内容已成功读取")
+                    return file_content
+            except Exception as e:
+                print(f"读取文件 {filename} 时出错: {e}")
+                return None
     
 
 INSTANCE = Retrievemodel()
