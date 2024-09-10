@@ -2,7 +2,7 @@ from typing import List, Dict
 from client.clientfactory import Clientfactory
 
 _GENERATE_Internet_PROMPT_ = (
-    "请替用户提取出l个可以在搜索引擎上搜索的问题，用分号“；”分隔。（不要有多余的内容）"
+    "请根据用户的提问，提取出一个可以在搜索引擎上搜索的问题（不要有多余的内容）"
 )
 
 
@@ -16,7 +16,7 @@ def __construct_messages(
         }
     ]
 
-    messages.append({"role": "user", "content": question})
+    messages.append({"role": "user", "content": f"用户提问：{question}"})
     messages.append({"role": "user", "content": _GENERATE_Internet_PROMPT_})
 
     return messages

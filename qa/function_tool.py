@@ -83,10 +83,8 @@ def process_unknown_tool(
     history: List[List | None] = None,
     image_url=None,
 ):
-    if len(question)==0:
-        question=question="请你输出：对不起，我无法识别你的问题，请你重新输入问题"
-        response = Clientfactory().get_client().chat_with_ai_stream(question, history)
-        return (response, question_type)
+    response = Clientfactory().get_client().chat_with_ai_stream(question, history)
+    return (response, question_type)
 
 
 # 处理RAG问题
@@ -163,15 +161,14 @@ def process_ppt_tool(
     )  # 这个语句由于模型能力有限，可能不会按照格式输出，会导致冲突，要用str正则语句修改，删除一些异常符号，否则会出bug
     return (ppt_file, "ppt"), userPurposeType.PPT
 
+
 def process_docx_tool(
     question_type, question: str, history: List[List[str] | None] = None, image_url=None
 ) -> Tuple[Tuple[str, str], userPurposeType]:
     # 先生成word的文案
-    raw_text:str = generate_docx_content(question,history)
+    raw_text: str = generate_docx_content(question, history)
     docx_content = json.loads(raw_text)
-    docx_file: str = generate_docx(
-        docx_content
-    )
+    docx_file: str = generate_docx(docx_content)
     return (docx_file, "docx"), userPurposeType.Docx
 
 
@@ -240,7 +237,6 @@ def process_InternetSearch_tool(
 ):
     response, links, success = InternetSearchChain(question, history)
     return (response, question_type, links, success)
-
 
 
 QUESTION_TO_FUNCTION = {
