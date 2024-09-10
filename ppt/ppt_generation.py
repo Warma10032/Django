@@ -53,7 +53,7 @@ def generate(ppt_content: Dict) -> str:
 
     return _output_file
 
-
+#自动清除缓存
 def clear_ppt_cache():
     try:
         clear_files_by_timediff(_OUTPUT_DIR, datetime.timedelta(minutes=10).seconds)
