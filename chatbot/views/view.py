@@ -12,7 +12,7 @@ from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
 
 from rest_framework import status
-#from app import start_gradio
+from app import start_gradio
 
 
 
@@ -73,9 +73,9 @@ def login(request):
         thread = threading.Thread(target=INSTANCE.build_user_vector_store(), args=(username,))
         thread.start()
 
-        # thread_2 = threading.Thread(target=start_gradio)
-        # thread_2.daemon = True
-        # thread_2.start()
+        thread_2 = threading.Thread(target=start_gradio)
+        thread_2.daemon = True
+        thread_2.start()
 
         # 返回成功响应
         return Response({'message': '登录成功'}, status=200)

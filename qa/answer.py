@@ -35,7 +35,7 @@ def get_answer(
 
     # entities = check_entity(question)
 
-     function = map_question_to_function(question_type)
+    function = map_question_to_function(question_type)
      # args_getter = map_question_to_function_args(question_type)
      # args = args_getter([question_type, question, history, entities])
 
