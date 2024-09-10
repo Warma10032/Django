@@ -1,4 +1,6 @@
 import gradio as gr
+import base64
+from openai import OpenAI
 from qa.answer import get_answer
 from qa.function_tool import process_image_describe_tool
 import speech_recognition as  sr
@@ -8,13 +10,19 @@ from client.LLMclientgeneric import LLMclientgeneric
 from icecream import ic
 
 AVATAR = ("resource/user.png", "resource//bot.jpg")
-
-
 def stream_output(text, chunk_size=5):
     for i in range(0, len(text), chunk_size):
         yield text[i : i + chunk_size]
 
+def image_to_base64(image_path):
+    with open(image_path, "rb") as image_file:
+        base64_encoded = base64.b64encode(image_file.read()).decode("utf-8")
+    return base64_encoded
 
+def generate_base64_image_html(image_path):
+    base64_encoded = image_to_base64(image_path)
+    image_html = f'<img src="data:image/jpeg;base64,{base64_encoded}" alt="Uploaded Image" style="max-width: 200px; height: auto;" />'
+    return image_html
 
 def audio_to_text(audio_file_path):
         # 创建识别器对象
@@ -32,15 +40,14 @@ def audio_to_text(audio_file_path):
         except sr.RequestError as e:
             return f" 谷歌演讲API拒绝您的请求   "
 
-# 核心函数
-
-def grodio_chat_view(message, history, image,audio):
+def grodio_chat_view(message, history, image,filepath,audio):
      #将语音输入转化为文本
     if audio is not None:
         if len(message)>0:
               message=audio_to_text(audio)+message
         else:
               message =audio_to_text(audio)
+
 
     ic(message)
     ic(history)
@@ -58,7 +65,7 @@ def grodio_chat_view(message, history, image,audio):
         # 流式输出
         for chunk in answer[0]:
             partial_message = partial_message + (chunk.choices[0].delta.content or "")
-            yield partial_message
+            yield partial_message 
     # 处理图片生成
     if answer[1] == userPurposeType.ImageGeneration:
         image_url = answer[0]
@@ -78,12 +85,20 @@ def grodio_chat_view(message, history, image,audio):
         yield combined_message
     # 处理图片描述
     if answer[1] == userPurposeType.ImageDescribe:
+        if len(message)==0:
+            message ="描述这个图片？"
+        # 将图片转换为 Base64 格式
+        image_html = generate_base64_image_html(image)
+        # 合并文本和图片为用户的消息
+        user_message = f"您好，您的问题可能是：{message}<br>您上传了：<br>{image_html}<br>下面是我基于现有知识的回答"
+        print(type(user_message))
         output_message = answer[0]
-        chunk_size = 1  # 设定每次输出的字符数
-        for i in range(0, len(output_message), chunk_size):
-            partial_message = output_message[: i + chunk_size]
-            yield partial_message
-    # 处理视频
+        print(type(output_message))
+        combined_message = f"{user_message}<br>{output_message}"
+     #   chunk_size = 1  # 设定每次输出的字符数
+      #  for i in range(0, len( combined_message), chunk_size):
+          #  partial_message =  combined_message[: i + chunk_size]
+        yield  combined_message
     if answer[1] == userPurposeType.Video:
         if answer[0] is not None:
             yield answer[0]
@@ -107,6 +122,7 @@ def grodio_chat_view(message, history, image,audio):
         for chunk in answer[0]:
             partial_message = partial_message + (chunk.choices[0].delta.content or "")
             yield partial_message
+  
 
 
 # textbox=gr.Textbox(placeholder="请输入你的问题", container=False, scale=7),  # 输入框配置
@@ -120,9 +136,9 @@ interface = gr.ChatInterface(
     ),  # 输入框配置
 
     additional_inputs=[
-        gr.Image(type="filepath", label="上传图像"),  # 上传图像功能
-        gr.File(label="上传知识库", type="filepath")  # 上传文件功能
-	gr.Audio(type="filepath", label="语音输入"),  # 语音输入功能
+        gr.Image(type="filepath", label="上传图像",every=2),  # 上传图像功能
+        gr.File(label="上传知识库", type="filepath"),  # 上传文件功能
+        gr.Audio(type="filepath", label="语音输入"),  # 语音输入
     ],
     additional_inputs_accordion_name="你的额外输入",
     title="「赛博华佗」📒",  # 聊天界面的标题
@@ -150,6 +166,4 @@ interface = gr.ChatInterface(
     clear_btn="清除所有",
     concurrency_limit=4,  # 并发限制cd
 )
-
-def start_gradio():
-     interface.launch(share=True)
+interface.launch()
