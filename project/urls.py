@@ -21,7 +21,6 @@ from project.settings import BASE_DIR
 
 urlpatterns = [
     path('', RedirectView.as_view(url='chatbot/')),
-    path('admin/', admin.site.urls),
     path('chatbot/', include('chatbot.urls')),
 ]
 

@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from django.http import HttpResponse
 from django.core.handlers.asgi import ASGIHandler
 from model.RAG.retrieve_model import INSTANCE
-#from app import start_gradio
+# from app import start_gradio
 import threading
 
 
