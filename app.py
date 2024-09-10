@@ -88,10 +88,7 @@ def text_file_to_str(text_file):
 def grodio_view(chatbot, chat_input):
 
     # 用户消息立即显示
-    if chat_input["text"] == "":
-        user_message = "\n"
-    else:
-        user_message = chat_input["text"]
+    user_message = chat_input["text"]
     bot_response = "loading..."
     chatbot.append([user_message, bot_response])
     yield chatbot
@@ -207,6 +204,14 @@ def grodio_view(chatbot, chat_input):
         else:
             chatbot[-1][1] = "抱歉，PPT生成失败，请稍后再试"
         yield chatbot
+        
+    # 处理Docx
+    if answer[1] == userPurposeType.Docx:
+        if answer[0] is not None:
+            chatbot[-1][1] = answer[0]
+        else:
+            chatbot[-1][1] = "抱歉，文档生成失败，请稍后再试"
+        yield chatbot
 
     # 处理音频生成
     if answer[1] == userPurposeType.Audio:
@@ -241,7 +246,7 @@ def gradio_audio_view(chatbot, audio_input):
 
     # 用户消息立即显示
     if audio_input is None:
-        user_message = "\n"
+        user_message = ""
     else:
         user_message = (audio_input, "audio")
     bot_response = "loading..."
@@ -252,7 +257,9 @@ def gradio_audio_view(chatbot, audio_input):
         audio_message = "无音频"
     else:
         audio_message = audio_to_text(audio_input)
-
+        
+    chatbot[-1][0] = audio_message
+    
     user_message = ""
     if audio_message == "无音频":
         user_message += "请你将下面的句子修饰后输出，不要包含额外的文字，句子:'欢迎与我对话，我将用语音回答您'"
@@ -266,7 +273,7 @@ def gradio_audio_view(chatbot, audio_input):
     if user_message == "":
         user_message = "请你将下面的句子修饰后输出，不要包含额外的文字，句子:'请问您有什么想了解的，我将尽力为您服务'"
     
-    chatbot[-1][0] = user_message
+    
     answer = get_answer(user_message, chatbot)
     bot_response = ""
 

@@ -24,7 +24,7 @@ purpose_map={
 "基于文件描述":userPurposeType.Document,
 "问候语":userPurposeType.Hello,
 "PPT生成":userPurposeType.PPT,
-"word生成":userPurposeType.Docx,
+"Word生成":userPurposeType.Docx,
 "网络搜索":userPurposeType.InternetSearch
 }
 

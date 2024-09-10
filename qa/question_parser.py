@@ -34,8 +34,8 @@ def parse_question(question: str, image_url) -> userPurposeType:
         return purpose_map["视频生成"]
     if  response =="PPT生成" and len(question) >0:
          return purpose_map["PPT生成"]
-    if  response =="word生成" and len(question) >0:
-         return purpose_map["word生成"]
+    if  response =="Word生成" and len(question) >0:
+         return purpose_map["Word生成"]
     if response == "音频生成" and len(question) >0:
         return purpose_map["音频生成"]
     if response == "文本生成":
