@@ -263,34 +263,48 @@ class Retrievemodel(Modelbase):
                 os.remove(file_path)
             print(f"用户 {self.user_id} 文件夹已清空")
 
+    # def view_uploaded_file(self, filename):
+    #     """根据文件名查看用户文件内容"""
+    #     user_data_path = os.path.join('user_data', self.user_id)
+    #     file_path = os.path.join(user_data_path, filename)
+
+    #     if not os.path.exists(file_path):
+    #         print(f"文件 {filename} 不存在")
+    #         return None
+
+    #     # 根据文件类型选择不同的读取方式
+    #     if filename.endswith('.docx'):
+    #         try:
+    #             doc = Document(file_path)
+    #             file_content = "\n".join([para.text for para in doc.paragraphs])
+    #             print(f"文件 {filename} 内容已成功读取")
+    #             return file_content
+    #         except Exception as e:
+    #             print(f"读取文件 {filename} 时出错: {e}")
+    #             return None
+    #     else:
+    #         try:
+    #             with open(file_path, 'r', encoding='utf-8') as file:
+    #                 file_content = file.read()
+    #                 print(f"文件 {filename} 内容已成功读取")
+    #                 return file_content
+    #         except Exception as e:
+    #             print(f"读取文件 {filename} 时出错: {e}")
+    #             return None
+    
+    
     def view_uploaded_file(self, filename):
-        """根据文件名查看用户文件内容"""
-        user_data_path = os.path.join('user_data', self.user_id)
-        file_path = os.path.join(user_data_path, filename)
+        """根据文件名返回用户文件的路径"""
+        user_data_path = os.path.join('user_data', self.user_id)  # 定义用户文件夹路径
+        file_path = os.path.join(user_data_path, filename)  # 拼接完整的文件路径
 
         if not os.path.exists(file_path):
             print(f"文件 {filename} 不存在")
             return None
 
-        # 根据文件类型选择不同的读取方式
-        if filename.endswith('.docx'):
-            try:
-                doc = Document(file_path)
-                file_content = "\n".join([para.text for para in doc.paragraphs])
-                print(f"文件 {filename} 内容已成功读取")
-                return file_content
-            except Exception as e:
-                print(f"读取文件 {filename} 时出错: {e}")
-                return None
-        else:
-            try:
-                with open(file_path, 'r', encoding='utf-8') as file:
-                    file_content = file.read()
-                    print(f"文件 {filename} 内容已成功读取")
-                    return file_content
-            except Exception as e:
-                print(f"读取文件 {filename} 时出错: {e}")
-                return None
-    
+        # 文件存在时返回文件的完整路径
+        print(f"文件 {filename} 路径已成功获取")
+        return file_path
+
 
 INSTANCE = Retrievemodel()
