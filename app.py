@@ -482,4 +482,5 @@ with gr.Blocks() as demo:
     )
 
 # 启动应用
-demo.launch()
+def start_gradio():
+    demo.launch()
