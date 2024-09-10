@@ -6,8 +6,10 @@ from client.clientfactory import Clientfactory
 from zhipuai import ZhipuAI
 from qa.purpose_type import userPurposeType
 from pathlib import Path
-from ppt.ppt_generation import generate as generate_ppt
-from ppt.ppt_content import generate_ppt_content
+from ppt_docx.ppt_generation import generate as generate_ppt
+from ppt_docx.ppt_content import generate_ppt_content
+from ppt_docx.docx_generation import generate_docx_content as generate_docx
+from ppt_docx.docx_content import generate_docx_content
 from rag import rag_chain
 from audio.audio_extract import (
     extract_text,
@@ -81,6 +83,8 @@ def process_unknown_tool(
     history: List[List | None] = None,
     image_url=None,
 ):
+    if len(question)==0：
+    question=question="请你输出：对不起，我无法识别你的问题，请你重新输入问题"
     response = Clientfactory().get_client().chat_with_ai_stream(question, history)
     return (response, question_type)
 
@@ -159,6 +163,17 @@ def process_ppt_tool(
     )  # 这个语句由于模型能力有限，可能不会按照格式输出，会导致冲突，要用str正则语句修改，删除一些异常符号，否则会出bug
     return (ppt_file, "ppt"), userPurposeType.PPT
 
+def process_docx_tool(
+    question_type, question: str, history: List[List[str] | None] = None, image_url=None
+) -> Tuple[Tuple[str, str], userPurposeType]:
+    # 先生成word的文案
+    raw_text:str = generate_docx_content(question,history)
+    docx_content = json.loads(raw_text)
+    docx_file: str = generate_docx(
+        docx_content
+    )
+    return (docx_file, "docx"), userPurposeType.Docx
+
 
 def process_text_video_tool(question_type, question, history, image_url=None):
     client = Clientfactory.get_special_client(client_type=question_type)
@@ -227,6 +242,7 @@ def process_InternetSearch_tool(
     return (response, question_type, links, success)
 
 
+
 QUESTION_TO_FUNCTION = {
     userPurposeType.Unknown: process_unknown_tool,
     userPurposeType.Document: RAG_tool,
@@ -235,6 +251,7 @@ QUESTION_TO_FUNCTION = {
     userPurposeType.InternetSearch: process_InternetSearch_tool,
     userPurposeType.ImageDescribe: process_image_describe_tool,
     userPurposeType.PPT: process_ppt_tool,
+    userPurposeType.Docx: process_docx_tool,
     userPurposeType.Video: process_text_video_tool,
 }
 

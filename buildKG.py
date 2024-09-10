@@ -3,7 +3,7 @@ import json
 from concurrent.futures import ThreadPoolExecutor
 
 # 连接到 Neo4j 数据库
-graph = Graph("bolt://localhost:7687", auth=("neo4j", ""))
+graph = Graph("bolt://localhost:7687", auth=("neo4j", "12345678"))
 
 
 # 定义处理每个 JSON 对象的函数

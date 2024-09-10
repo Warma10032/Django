@@ -36,7 +36,7 @@ class Clientfactory:
             return OurAPI()
         if client_type == userPurposeType.ImageDescribe:
             return Image_describe_client
-        if client_type == userPurposeType.Audio:
+        if client_type == userPurposeType.Video:
             print(8)
             return Video_client
 
