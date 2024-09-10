@@ -9,3 +9,4 @@ flagged/
 project/settings.py
 
 data/cache/
+user_data/
