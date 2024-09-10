@@ -16,7 +16,7 @@ def get_file_path(text):
     return os.path.join(_OUTPUT_DIR, f"{file_name}.mp3")
 
 
-def audio_generate(text: str, model_name: str) -> str:
+def audio_generate(text: str, model_name : str) -> str:
     _output_file = get_file_path(text)
 
     # 异步调用_generating函数，使得I/O时可以进行其他操作

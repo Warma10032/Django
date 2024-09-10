@@ -110,7 +110,7 @@ def process_images_tool(question_type, question, history, image_url=None):
 
 def process_image_describe_tool(question_type, question, history, image_url=None):
     if question is None:
-        question ="描述这个图片，说明这个图片的主要内容"
+        question = "描述这个图片，说明这个图片的主要内容"
 
     img_path = image_url
     client = Clientfactory.get_special_client(client_type=question_type)
@@ -124,11 +124,7 @@ def process_image_describe_tool(question_type, question, history, image_url=None
                         "role": "user",
                         "content": [
                             {"type": "image_url", "image_url": {"url": img_base}},
-                            {
-                                "type": "text",
-                                "text": question
-                                
-                            },
+                            {"type": "text", "text": question},
                         ],
                     }
                 ],
@@ -217,7 +213,7 @@ def process_audio_tool(
         audio_file = audio_generate(
             "由于目标语言包缺失，我将用普通话回复您。" + text, model_name
         )
-    return ((audio_file, "音频"), userPurposeType.Audio)
+    return ((audio_file, "audio"), question_type)
 
 
 # 处理联网搜索问题的函数

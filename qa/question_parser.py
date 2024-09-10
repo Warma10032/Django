@@ -12,21 +12,22 @@ from model.KG.search_model import _Value
 from icecream import ic
 
 
-def parse_question(question: str,image_url) -> userPurposeType:
+def parse_question(question: str, image_url) -> userPurposeType:
 
     if "文献" in question :
         return purpose_map["基于文件描述"]
     
     if "搜索" in question:
         return purpose_map["网络搜索"]
+    
+    if image_url is not None :
+        return purpose_map["图片描述"]
 
     # 在这个函数中我们使用大模型去判断问题类型
     prompt = get_question_parser_prompt(question)
     response = Clientfactory().get_client().chat_with_ai(prompt)
-    print(response)
+    ic(response)
 
-    if image_url is not None :
-        return purpose_map["图片描述"]
     if response == "图片生成" and len(question) >0:
         return purpose_map["图片生成"]
     if  response =="视频生成" and len(question) >0:
