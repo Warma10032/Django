@@ -5,7 +5,9 @@ import threading
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import JsonResponse
-
+import os
+from django.http import FileResponse, Http404
+from django.conf import settings
 
 def upload_and_build( uploaded_file):
     # 先上传文件
@@ -45,14 +47,36 @@ def delete_file(request, filename):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
 
+# @api_view(['GET'])
+# def view_uploaded_file_view(request, filename):
+#     """根据文件名返回用户上传的文件内容"""
+#     try:
+#         file_content = INSTANCE.view_uploaded_file(filename)
+#         if file_content:
+#             return JsonResponse({'file_content': file_content}, status=200)
+#         else:
+#             return JsonResponse({'error': f'文件 {filename} 不存在或无法读取'}, status=404)
+#     except Exception as e:
+#         return JsonResponse({'error': str(e)}, status=500)
+    
 @api_view(['GET'])
 def view_uploaded_file_view(request, filename):
-    """根据文件名返回用户上传的文件内容"""
-    try:
-        file_content = INSTANCE.view_uploaded_file(filename)
-        if file_content:
-            return JsonResponse({'file_content': file_content}, status=200)
-        else:
-            return JsonResponse({'error': f'文件 {filename} 不存在或无法读取'}, status=404)
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
+    """根据文件名返回文件流用于下载或预览"""
+
+    file_path = INSTANCE.view_uploaded_file(filename)
+
+    if not os.path.exists(file_path):
+        raise Http404(f"文件 {filename} 不存在")
+
+    # 自动检测文件的类型
+    content_type = ''
+    if filename.endswith('.pdf'):
+        content_type = 'application/pdf'
+    elif filename.endswith('.docx'):
+        content_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    elif filename.endswith('.txt'):
+        content_type = 'text/plain'
+    else:
+        content_type = 'application/octet-stream'  # 通用文件类型
+
+    return FileResponse(open(file_path, 'rb'), content_type=content_type)
