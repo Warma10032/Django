@@ -12,7 +12,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import status
-from app import start_gradio
+# from app import start_gradio
 
 from chatbot.encrypt import md5
 from chatbot import forms
@@ -22,59 +22,56 @@ from chatbot import models
 
 
 # 登录函数
+@csrf_exempt
 @api_view(['POST'])
 def login(request):
     username = request.data.get('username')
     password = request.data.get('password')
+    print(username,password)
+    # 查找用户
+    try:
+        user = models.UserInfo.objects.get(username=username)
+    except models.UserInfo.DoesNotExist:
+        return Response({'message': '用户名或密码错误'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    # 使用 authenticate 来验证用户名和密码
-    user = authenticate(username=username, password=password)
-    print('zzzz')
-    
-    if user is not None:
-        # 假设用户名和密码匹配成功
+    # 检查密码是否匹配
+    if md5(password) == user.password:
+        # 用户名和密码匹配成功
         INSTANCE.set_user_id(username)
 
         # 启动构建用户向量存储的线程
-        thread = threading.Thread(target=INSTANCE.build_user_vector_store(), args=(username,))
+        thread = threading.Thread(target=INSTANCE.build_user_vector_store, args=(username,))
         thread.start()
 
-        thread_2 = threading.Thread(target=start_gradio)
-        thread_2.daemon = True
-        thread_2.start()
+        # thread_2 = threading.Thread(target=start_gradio)
+        # thread_2.daemon = True
+        # thread_2.start()
+        
         # 返回成功响应
-        return Response({'message': '登录成功'}, status=200)
+        return Response({'message': '登录成功'}, status=status.HTTP_200_OK)
     else:
         # 登录失败，返回错误信息
-        return Response({'message': '用户名或密码错误'}, status=401)
+        return Response({'message': '用户名或密码错误'}, status=status.HTTP_401_UNAUTHORIZED)
 
 # 注册函数
 @csrf_exempt
 @api_view(['POST'])
 def register(request):
-    username = request.data.get('username')
-    email = request.data.get('email')
-    password = request.data.get('password')
+    data = request.data  # 使用 request.data 获取 JSON 数据
+    form = forms.UserForm(data=data)
 
-    # 检查用户名是否已经存在
-    if User.objects.filter(username=username).exists():
-        return JsonResponse({'message': '用户名已存在'}, status=status.HTTP_400_BAD_REQUEST)
+    # 检查表单是否有效
+    if form.is_valid():
+        # 检查用户名是否已存在
+        if models.UserInfo.objects.filter(username=form.cleaned_data['username']).exists():
+            return JsonResponse({'message': '用户名已存在'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # 检查邮箱是否已经存在
-    if User.objects.filter(email=email).exists():
-        return JsonResponse({'message': '邮箱已存在'}, status=status.HTTP_400_BAD_REQUEST)
-
-    # 创建用户并将密码加密存储到数据库
-    try:
-        user = User.objects.create(
-            username=username,
-            email=email,
-            password=make_password(password)  # 使用 make_password() 进行加密
-        )
+        # 保存新用户
+        form.save()
         return JsonResponse({'message': '注册成功'}, status=status.HTTP_201_CREATED)
-    except Exception as e:
-        return JsonResponse({'message': f'注册失败: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    else:
+        # 表单无效，返回错误信息
+        return JsonResponse({'message': '注册失败', 'errors': form.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 # 选择页面视图
 def choice_view(request):
