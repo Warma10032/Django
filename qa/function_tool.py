@@ -1,7 +1,7 @@
 import base64
 from typing import Callable, List, Dict, Tuple
 import time
-import json
+import json5
 from client.clientfactory import Clientfactory
 from zhipuai import ZhipuAI
 from qa.purpose_type import userPurposeType
@@ -81,8 +81,8 @@ def process_unknown_tool(
     history: List[List | None] = None,
     image_url=None,
 ):
-    if len(question)==0：
-    question=question="请你输出：对不起，我无法识别你的问题，请你重新输入问题"
+    if len(question) ==0:
+        question="请你输出：对不起，我无法识别你的问题，请你重新输入问题"
     response = Clientfactory().get_client().chat_with_ai_stream(question, history)
     return (response, question_type)
 
@@ -111,9 +111,9 @@ def process_images_tool(question_type, question, history, image_url=None):
 
 
 def process_image_describe_tool(question_type, question, history, image_url=None):
-    if question is None:
+    if len(question)==0:
         question ="描述这个图片，说明这个图片的主要内容"
-
+    print(question)
     img_path = image_url
     client = Clientfactory.get_special_client(client_type=question_type)
     if is_file_path(img_path):
@@ -159,7 +159,7 @@ def process_ppt_tool(
     question_type, question: str, history: List[List[str] | None] = None, image_url=None
 ) -> Tuple[Tuple[str, str], userPurposeType]:
     raw_text: str = generate_ppt_content(question, history)
-    ppt_content = json.loads(raw_text)
+    ppt_content = json5.loads(raw_text)
     ppt_file: str = generate_ppt(
         ppt_content
     )  # 这个语句由于模型能力有限，可能不会按照格式输出，会导致冲突，要用str正则语句修改，删除一些异常符号，否则会出bug
