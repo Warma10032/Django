@@ -405,15 +405,16 @@ examples = [
     {"text": "糖尿病人适合吃的食物有哪些？", "files": []},
     {"text": "糖尿病的常见症状有哪些？", "files": []},
     {
-        "text": "帮我生成一份有关糖尿病发病原因，症状，治疗药物，预防措施的PPT",
+        "text": "帮我生成一份用于科普糖尿病发病原因，症状，治疗药物，预防措施的PPT",
         "files": [],
     },
-    {"text": "请根据我给的就诊信息单，给我一个合理化饮食建议", "files": []},
+    {"text": "请根据我给的参考资料，给我一个合理的饮食建议", "files": []},
+    {"text": "请根据我给的参考资料，生成一个用于科普合理膳食的word", "files": []},
     {"text": "我最近想打太极养生，帮我生成一段老人打太极的视频吧", "files": []},
     {"text": "帮我生成一张老人练太极图片", "files": []},
     {"text": "用语音重新回答我一次", "files": []},
-    {"text": "根据文献帮我快速入门git", "files": []},
-    {"text": "搜索一下最新新闻", "files": []},
+    {"text": "根据知识库介绍一下常见疾病", "files": []},
+    {"text": "帮我搜索一下养生知识", "files": []},
 ]
 
 
@@ -448,7 +449,7 @@ with gr.Blocks() as demo:
 
     with gr.Row() as example_row:
         example_component = gr.Examples(
-            examples=examples, inputs=chat_input, visible=True
+            examples=examples, inputs=chat_input, visible=True, examples_per_page=15
         )
 
     chat_input.submit(fn=grodio_view, inputs=[chatbot, chat_input], outputs=[chatbot])
