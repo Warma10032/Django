@@ -1,3 +1,4 @@
+import base64
 from qa.answer import get_answer
 from qa.function_tool import process_image_describe_tool
 from qa.purpose_type import userPurposeType
@@ -82,6 +83,12 @@ def text_file_to_str(text_file):
     # 使用检测到的编码来读取文件
     with open(text_file, "r", encoding=encoding) as file:
         return file.read()
+
+
+def image_to_base64(image_path):
+    with open(image_path, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
+        return encoded_string
 
 
 # 核心函数
@@ -183,11 +190,19 @@ def grodio_view(chatbot, chat_input):
 
     # 处理图片描述
     if answer[1] == userPurposeType.ImageDescribe:
-        output_message = answer[0]
-        for i in range(0, len(output_message)):
-            bot_response = output_message[: i + 1]
-            chatbot[-1][1] = bot_response
-            yield chatbot
+        if images[0] is not None:
+            image_url1 = image_to_base64(images[0])  # 将图片路径转换为 Base64
+        # 生成包含图片和文本的消息
+        combined_message = f"""
+                    <div>
+                        <p>您上传的图片是：</p>
+                        <img id="myImage" src="data:image/png;base64,{image_url1}" alt="Generated Image" style="max-width: 100%; height: auto; cursor: pointer;" />
+                        <p>下面是我根据这张图片给出回答：</p>
+                        <p>{answer[0]}</p>
+                    </div>
+                  """
+        chatbot[-1][1] = combined_message
+        yield chatbot
 
     # 处理视频
     if answer[1] == userPurposeType.Video:
@@ -204,7 +219,7 @@ def grodio_view(chatbot, chat_input):
         else:
             chatbot[-1][1] = "抱歉，PPT生成失败，请稍后再试"
         yield chatbot
-        
+
     # 处理Docx
     if answer[1] == userPurposeType.Docx:
         if answer[0] is not None:
@@ -257,9 +272,9 @@ def gradio_audio_view(chatbot, audio_input):
         audio_message = "无音频"
     else:
         audio_message = audio_to_text(audio_input)
-        
+
     chatbot[-1][0] = audio_message
-    
+
     user_message = ""
     if audio_message == "无音频":
         user_message += "请你将下面的句子修饰后输出，不要包含额外的文字，句子:'欢迎与我对话，我将用语音回答您'"
@@ -272,8 +287,7 @@ def gradio_audio_view(chatbot, audio_input):
 
     if user_message == "":
         user_message = "请你将下面的句子修饰后输出，不要包含额外的文字，句子:'请问您有什么想了解的，我将尽力为您服务'"
-    
-    
+
     answer = get_answer(user_message, chatbot)
     bot_response = ""
 
@@ -282,9 +296,9 @@ def gradio_audio_view(chatbot, audio_input):
         # 语音输出
         for chunk in answer[0]:
             # 获取每个块的数据
-            chunk_content = (chunk.choices[0].delta.content or "")
+            chunk_content = chunk.choices[0].delta.content or ""
             bot_response += chunk_content
-            
+
         chatbot[-1][1] = (
             audio_generate(
                 text=bot_response,
@@ -364,9 +378,9 @@ def gradio_audio_view(chatbot, audio_input):
         # 语音输出
         for chunk in answer[0]:
             # 获取每个块的数据
-            chunk_content = (chunk.choices[0].delta.content or "")
+            chunk_content = chunk.choices[0].delta.content or ""
             bot_response += chunk_content
-            
+
         chatbot[-1][1] = (
             audio_generate(
                 text=bot_response,
@@ -427,7 +441,16 @@ with gr.Blocks() as demo:
     with gr.Row():
         with gr.Column(scale=10):
             chatbot = gr.Chatbot(
-                height=600, avatar_images=AVATAR, show_copy_button=True
+                height=600,
+                avatar_images=AVATAR,
+                show_copy_button=True,
+                latex_delimiters=[
+                    {"left": "\\(", "right": "\\)", "display": True},
+                    {"left": "\\[", "right": "\\]", "display": True},
+                    {"left": "$$", "right": "$$", "display": True},
+                    {"left": "$", "right": "$", "display": True},
+                ],
+                placeholder="**欢迎与我对话**",
             )
 
     with gr.Row():
@@ -439,7 +462,10 @@ with gr.Blocks() as demo:
                 show_label=False,
             )
             audio_input = gr.Audio(
-                sources=["microphone","upload"], label="录音输入", visible=False, type="filepath"
+                sources=["microphone", "upload"],
+                label="录音输入",
+                visible=False,
+                type="filepath",
             )
         with gr.Column(scale=1):
             clear = gr.ClearButton([chatbot, chat_input, audio_input], value="清除记录")
@@ -481,6 +507,7 @@ with gr.Blocks() as demo:
     submit_audio_button.click(
         fn=gradio_audio_view, inputs=[chatbot, audio_input], outputs=[chatbot]
     )
+
 
 # 启动应用
 def start_gradio():
