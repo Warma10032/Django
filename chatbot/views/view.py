@@ -12,7 +12,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import status
-# from app import start_gradio
+from app import start_gradio
 
 from chatbot.encrypt import md5
 from chatbot import forms
@@ -40,12 +40,12 @@ def login(request):
         INSTANCE.set_user_id(username)
 
         # 启动构建用户向量存储的线程
-        thread = threading.Thread(target=INSTANCE.build_user_vector_store, args=(username,))
+        thread = threading.Thread(target=INSTANCE.build_user_vector_store(), args=(username,))
         thread.start()
 
-        # thread_2 = threading.Thread(target=start_gradio)
-        # thread_2.daemon = True
-        # thread_2.start()
+        thread_2 = threading.Thread(target=start_gradio)
+        thread_2.daemon = True
+        thread_2.start()
         
         # 返回成功响应
         return Response({'message': '登录成功'}, status=status.HTTP_200_OK)

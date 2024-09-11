@@ -5,6 +5,6 @@ from langchain_core.documents import Document
 
 def retrieve(query:str) ->List[Document]:
     doc_user = INSTANCE.get_user_retriever().invoke(query)
-    #doc_local = INSTANCE.retriever.invoke(query)
+    # doc_local = INSTANCE.retriever.invoke(query)
     doc_all = doc_user 
     return doc_all

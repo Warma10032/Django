@@ -7,7 +7,7 @@ model:
   graph-entity:
     search-key: name
   embedding: 
-    model-name: C:/Users/李衍铭/.cache/modelscope/hub/iic/nlp_corom_sentence-embedding_chinese-base
+    model-name: C:\Users\16013\.cache\modelscope\hub\iic\nlp_corom_sentence-embedding_chinese-base
     device: cpu
 # C:/Users/李衍铭/.cache/modelscope/hub/iic/nlp_corom_sentence-embedding_chinese-base
 
