@@ -1,7 +1,5 @@
-from env import get_env_value
 from typing import List,Dict
 
-from openai import OpenAI
 from openai.types.chat import ChatCompletion,ChatCompletionChunk
 from openai import Stream
 

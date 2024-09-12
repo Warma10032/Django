@@ -9,7 +9,7 @@ model:
   embedding: 
     model-name: C:\Users\16013\.cache\modelscope\hub\iic\nlp_corom_sentence-embedding_chinese-base
     device: cpu
-# C:/Users/李衍铭/.cache/modelscope/hub/iic/nlp_corom_sentence-embedding_chinese-base
+
 
 database:
   neo4j:
@@ -17,4 +17,4 @@ database:
     database: neo4j
     username: neo4j
     # 注意数字用引号引起来
-    password: '12345678'
+    password: TangZiYe20050316

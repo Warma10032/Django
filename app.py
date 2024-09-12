@@ -20,10 +20,8 @@ from opencc import OpenCC
 AVATAR = ("resource/user.png", "resource/bot.jpg")
 
 
-# pip install zhconv
 # pip install whisper
 # pip install openai-whisper
-# pip install wheel
 # pip install soundfile
 # pip install pydub
 # pip install opencc-python-reimplemented

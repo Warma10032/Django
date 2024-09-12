@@ -6,40 +6,36 @@ from qa.purpose_type import userPurposeType
 
 
 class Clientfactory:
-    map_client_dict = {
-        get_env_value("LLM_BASE_URL")
-    }
-      
-    def __init__(self) :
+    # 初始化client字典，使用环境变量中的LLM_BASE_URL
+    map_client_dict = {get_env_value("LLM_BASE_URL")}
+
+    # 初始化client的url和apikey，使用环境变量中的LLM_BASE_URL，LLM_API_KEY
+    def __init__(self):
         self._client_url = get_env_value("LLM_BASE_URL")
         self._api_key = get_env_value("LLM_API_KEY")
-        #self._sanity_check()
-       
-    
-    # 选择 , 这里我们暂时只用自己的API，不需要选择client
-    # def _sanity_check():
-        
-    #     pass
- 
-    # 注意python面向对象里面的函数会自动传入一个self类,所以参数里面必须加上self,否则会报错
-    def get_client(self):
-          return OurAPI()
 
+    def get_client(self):
+        """
+        获取默认的客户端实例
+        """
+        return OurAPI()  # 返回我们自己的API客户端实例
 
     @staticmethod
-    def get_special_client(client_type:str):
+    def get_special_client(client_type: str):
+        """
+        根据客户端类型获取特定的客户端实例
+        :param client_type: 客户端类型，字符串类型
+        :return: 对应的客户端实例
+        """
         print(userPurposeType.ImageGeneration)
         if client_type == userPurposeType.ImageGeneration:
-            print(3)
             return Image_client
         if client_type == userPurposeType.Unknown:
             return OurAPI()
         if client_type == userPurposeType.ImageDescribe:
             return Image_describe_client
         if client_type == userPurposeType.Video:
-            print(8)
             return Video_client
 
-        print(5)
-        #默认情况下使用文本生成模型
+        # 默认情况下使用文本生成模型
         return OurAPI()
