@@ -113,7 +113,7 @@ def process_images_tool(question_type, question, history, image_url=None):
 def process_image_describe_tool(question_type, question, history, image_url=None):
     if question is None:
         question = "描述这个图片，说明这个图片的主要内容"
-
+    # 代办：处理用户上传的多张图片逻辑
     img_path = image_url[0]
     client = Clientfactory.get_special_client(client_type=question_type)
     if is_file_path(img_path):

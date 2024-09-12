@@ -1,4 +1,5 @@
 import base64
+from time import sleep
 from qa.answer import get_answer
 from qa.function_tool import process_image_describe_tool
 from qa.purpose_type import userPurposeType
@@ -137,7 +138,18 @@ def grodio_view(chatbot, chat_input):
                 user_message += f"音频{i+1}内容：{audio_message}"
 
     if images != []:
+        # 代办：多图片的处理
         image_url = images
+        image_url0 = image_to_base64(image_url[0])
+
+        chatbot[-1][
+            0
+        ] += f"""
+            <div>
+                <img id="myImage" src="data:image/png;base64,{image_url0}" alt="Generated Image" style="max-width: 100%; height: auto; cursor: pointer;" />
+            </div>
+            """
+        yield chatbot
     else:
         image_url = None
 
@@ -179,30 +191,19 @@ def grodio_view(chatbot, chat_input):
             image_url=image_url,
         )
         combined_message = f"""
-        <div>
-            <p>生成的图片：</p>
-            <img id="myImage" src="{image_url}" alt="Generated Image" style="max-width: 100%; height: auto; cursor: pointer;" />
-            <p>{describe[0]}</p>
-        </div>
-        """
+            **生成的图片:**
+            ![Generated Image]({image_url})
+            {describe[0]}
+            """
         chatbot[-1][1] = combined_message
         yield chatbot
 
     # 处理图片描述
     if answer[1] == userPurposeType.ImageDescribe:
-        if images[0] is not None:
-            image_url1 = image_to_base64(images[0])  # 将图片路径转换为 Base64
-        # 生成包含图片和文本的消息
-        combined_message = f"""
-                    <div>
-                        <p>您上传的图片是：</p>
-                        <img id="myImage" src="data:image/png;base64,{image_url1}" alt="Generated Image" style="max-width: 100%; height: auto; cursor: pointer;" />
-                        <p>下面是我根据这张图片给出回答：</p>
-                        <p>{answer[0]}</p>
-                    </div>
-                  """
-        chatbot[-1][1] = combined_message
-        yield chatbot
+        for i in range(0, len(answer[0]), 1):
+            bot_response += answer[0][i : i + 1]  # 累加当前chunk到combined_message
+            chatbot[-1][1] = bot_response  # 更新chatbot对话中的最后一条消息
+            yield chatbot  # 实时输出当前累积的对话内容
 
     # 处理视频
     if answer[1] == userPurposeType.Video:
@@ -450,7 +451,7 @@ with gr.Blocks() as demo:
                     {"left": "$$", "right": "$$", "display": True},
                     {"left": "$", "right": "$", "display": True},
                 ],
-                placeholder="**欢迎与我对话**",
+                placeholder="\n## 欢迎与我对话 \n————本项目由赛博华佗团队开发",
             )
 
     with gr.Row():
@@ -511,4 +512,8 @@ with gr.Blocks() as demo:
 
 # 启动应用
 def start_gradio():
-    demo.launch()
+    demo.launch(share=True)
+
+
+if __name__ == "__main__":
+    start_gradio()
