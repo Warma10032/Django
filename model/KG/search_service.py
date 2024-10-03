@@ -1,5 +1,5 @@
-from typing import Tuple ,Optional,List,Dict
-from model.KG.search_model import INSTANCE,_Value
+from typing import Tuple,List,Dict
+from model.KG.search_model import INSTANCE
 
 def search(query:str) -> Tuple[int,List[Dict]|None]:
     result = INSTANCE.search(query)

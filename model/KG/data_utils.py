@@ -1,7 +1,5 @@
 from dataclasses import dataclass,field
-from pathlib import Path
-
-from py2neo import Node
+from config.config import Config
 from kg.Graph import GraphDao
 
 
@@ -14,13 +12,8 @@ class NodeEntities(object):
     # 获取节点
     def get_entities_iterator(self):
 
-        # # 通过 GraphDao 获取元数据节点，确认是否有数据
-        # meta_node = self.dao.query_meta_node()
-        # if not meta_node:
-        #     raise ValueError("没有找到元数据节点，请先创建元数据节点")
-
         # 定义你要查询的标签类型，比如疾病、症状、药物等
-        labels_to_query = ['Disease', 'Symptom', 'Check',"Department","Treatment"]
+        labels_to_query = Config.get_instance().get_with_nested_params("database", "neo4j", "node-label")
 
         node_list = []
 

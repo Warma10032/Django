@@ -18,20 +18,18 @@ from audio.audio_extract import (
     get_tts_model_name,
 )
 from audio.audio_generate import audio_generate
-
-
-def is_file_path(path):
-    return Path(path).exists()
-
-
+from model.KG.search_service import search
 from Internet.Internet_chain import InternetSearchChain
 from kg.Graph import GraphDao
-
+from config.config import Config
 from qa.purpose_type import userPurposeType
-from model.KG.search_model import _Value
+from env import get_env_value
+
 
 _dao = GraphDao()
 
+def is_file_path(path):
+    return Path(path).exists()
 
 def relation_tool(entities: List[Dict] | None) -> str | None:
     if not entities or len(entities) == 0:
@@ -40,31 +38,26 @@ def relation_tool(entities: List[Dict] | None) -> str | None:
     relationships = set()  # 使用集合来避免重复关系
     relationship_match = []
 
+    searchKey = Config.get_instance().get_with_nested_params("model", "graph-entity", "search-key")
     # 遍历每个实体并查询与其他实体的关系
     for entity in entities:
-        entity_name = entity["name"]
-        if entity["label"] == "Disease":
-            for k, v in entity.items():
-                relationships.add(f"{entity_name} {k}: {v}")
+        entity_name = entity[searchKey]
+        for k, v in entity.items():
+            relationships.add(f"{entity_name} {k}: {v}")
 
-        # 查询每个实体与其他实体的关系
-        relationship_match.append(_dao.query_relationship_by_person_name(entity_name))
-
+        # 查询每个实体与其他实体的关系a-r-b
+        relationship_match.append(_dao.query_relationship_by_name(entity_name))
+        
+    # 抽取并记录每个实体与其他实体的关系
     for i in range(len(relationship_match)):
         for record in relationship_match[i]:
             # 获取起始节点和结束节点的名称
 
-            start_name = record["r"].start_node["name"]
-            end_name = record["r"].end_node["name"]
+            start_name = record["r"].start_node[searchKey]
+            end_name = record["r"].end_node[searchKey]
 
             # 获取关系类型
-            rel = type(record["r"]).__name__  # 获取关系的类名，比如 CAUSES
-
-            # # 获取关系的备注信息，假设关系中可能有一个 'Notes' 属性
-            # notes = getattr(record['r'], 'Notes', '无')
-
-            # 构建关系字符串，打印或存储关系信息
-            print(f"{start_name} {rel} {end_name}")
+            rel = type(record["r"]).__name__  # 获取关系名称，比如 CAUSES
 
             # 构建关系字符串并添加到集合，确保不会重复添加
             relationships.add(f"{start_name} {rel} {end_name}")
@@ -74,6 +67,36 @@ def relation_tool(entities: List[Dict] | None) -> str | None:
         return "；".join(relationships)
     else:
         return None
+
+
+def check_entity(question: str) -> List[Dict]:
+    code, result = search(question)
+    if code == 0:
+        return result
+    else:
+        return None
+
+
+def KG_tool(
+    question_type: userPurposeType,
+    question: str,
+    history: List[List | None] = None,
+    image_url=None,
+):
+    kg_info = None
+    try:
+        # 此处在使用知识图谱之前，需先检查问题的实体
+        entities = check_entity(question)
+        kg_info = relation_tool(entities)
+    except:
+        pass
+
+    if kg_info is not None:
+        print(f"KG_tool: \n {kg_info}")
+        question = f"{question}\n从知识图谱中检索到的信息如下{kg_info}\n请你基于知识图谱的信息去回答,并给出知识图谱检索到的信息"
+
+    response = Clientfactory().get_client().chat_with_ai_stream(question, history)
+    return (response, question_type)
 
 
 # 处理Unkown问题的函数
@@ -103,7 +126,7 @@ def RAG_tool(
 def process_images_tool(question_type, question, history, image_url=None):
     client = Clientfactory.get_special_client(client_type=question_type)
     response = client.images.generations(
-        model="cogview-3",  # 填写需要调用的模型编码
+        model=get_env_value("IMAGE_GENERATE_MODEL"),  # 填写需要调用的模型编码
         prompt=question,
     )
     print(response.data[0].url)
@@ -111,44 +134,36 @@ def process_images_tool(question_type, question, history, image_url=None):
 
 
 def process_image_describe_tool(question_type, question, history, image_url=None):
-    if question is None:
+    if question == "请你将下面的句子修饰后输出，不要包含额外的文字，句子:'请问您有什么想了解的，我将尽力为您服务'":
         question = "描述这个图片，说明这个图片的主要内容"
-    # 代办：处理用户上传的多张图片逻辑
-    img_path = image_url[0]
+    image_bases = []
+    for img_url in image_url:
+        if is_file_path(img_url):
+            with open(img_url, "rb") as img_file:
+                image_base = base64.b64encode(img_file.read()).decode("utf-8")
+                image_bases.append(image_base)
+        else:
+            image_bases.append(img_url)
+
+    # 构建 messages 内容
+    message_content = []
+    for image_base in image_bases:
+        message_content.append({"type": "image_url", "image_url": {"url": image_base}})
+    # 添加问题的文本内容
+    message_content.append({"type": "text", "text": question})
+
     client = Clientfactory.get_special_client(client_type=question_type)
-    if is_file_path(img_path):
-        with open(img_path, "rb") as img_file:
-            img_base = base64.b64encode(img_file.read()).decode("utf-8")
-            response = client.chat.completions.create(
-                model="glm-4v-plus",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": [
-                            {"type": "image_url", "image_url": {"url": img_base}},
-                            {"type": "text", "text": question},
-                        ],
-                    }
-                ],
-            )
-        return (response.choices[0].message.content, question_type)
-    else:
-        response = client.chat.completions.create(
-            model="glm-4v-plus",  # 填写需要调用的模型名称
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "image_url", "image_url": {"url": image_url}},
-                        {
-                            "type": "text",
-                            "text": "图里有什么？请描述图里的主要内容",
-                        },
-                    ],
-                }
-            ],
-        )
-        return (response.choices[0].message.content, question_type)
+    # 发送请求
+    response = client.chat.completions.create(
+        model=get_env_value("IMAGE_DESCRIBE_MODEL"),
+        messages=[
+            {
+                "role": "user",
+                "content": message_content,
+            }
+        ],
+    )
+    return (response.choices[0].message.content, question_type)
 
 
 def process_ppt_tool(
@@ -175,7 +190,7 @@ def process_docx_tool(
 def process_text_video_tool(question_type, question, history, image_url=None):
     client = Clientfactory.get_special_client(client_type=question_type)
     chatRequest = client.videos.generations(
-        model="cogvideox",
+        model=get_env_value("VIDEO_GENERATE_MODEL"),
         prompt=question,
     )
     print(chatRequest)
@@ -249,6 +264,7 @@ QUESTION_TO_FUNCTION = {
     userPurposeType.PPT: process_ppt_tool,
     userPurposeType.Docx: process_docx_tool,
     userPurposeType.Video: process_text_video_tool,
+    userPurposeType.KnowledgeGraph: KG_tool,
 }
 
 

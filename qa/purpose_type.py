@@ -10,8 +10,10 @@ class userPurposeType(Enum):
     Document = 5  #基于文件描述，后面有个向量库，对于单个用户，尽量从向量数据库给出回答，可能涉及检索加强
     Hello = 6   #问候语，给出特定输出
     PPT=7      #PPT生成
-    Docx = 9   #生成word文件
     InternetSearch = 8 #网络搜索
+    Docx = 9   #生成word文件
+    KnowledgeGraph = 10 #基于知识图谱的问答
+ 
 
 
     
@@ -21,10 +23,11 @@ purpose_map={
 "视频生成":userPurposeType.Video,
 "图片描述":userPurposeType.ImageDescribe,
 "图片生成":userPurposeType.ImageGeneration,
-"基于文件描述":userPurposeType.Document,
+"基于知识库":userPurposeType.Document,
 "问候语":userPurposeType.Hello,
 "PPT生成":userPurposeType.PPT,
 "Word生成":userPurposeType.Docx,
-"网络搜索":userPurposeType.InternetSearch
+"网络搜索":userPurposeType.InternetSearch,
+"基于知识图谱":userPurposeType.KnowledgeGraph,
 }
 

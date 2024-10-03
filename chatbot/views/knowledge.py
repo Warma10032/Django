@@ -61,7 +61,7 @@ def delete_file(request, filename):
     
 @api_view(['GET'])
 def view_uploaded_file_view(request, filename):
-    """根据文件名返回文件流用于下载或预览"""
+    """根据文件名返回文件用于下载或预览"""
 
     file_path = INSTANCE.view_uploaded_file(filename)
 

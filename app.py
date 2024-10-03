@@ -3,7 +3,6 @@ from time import sleep
 from qa.answer import get_answer
 from qa.function_tool import process_image_describe_tool
 from qa.purpose_type import userPurposeType
-from client.LLMclientgeneric import LLMclientgeneric
 from audio.audio_generate import audio_generate
 
 import PyPDF2
@@ -99,6 +98,7 @@ def grodio_view(chatbot, chat_input):
     chatbot.append([user_message, bot_response])
     yield chatbot
 
+    # 处理用户上传的文件
     files = chat_input["files"]
     audios = []
     images = []
@@ -124,7 +124,7 @@ def grodio_view(chatbot, chat_input):
             user_message += "请你将下面的句子修饰后输出，不要包含额外的文字，句子:'该文件为不支持的文件类型'"
             print(f"Unknown file type: {file_type}")
 
-    # 音频解析逻辑示例
+    # 音频文件解析
     if audios != []:
         for i, audio in enumerate(audios):
             audio_message = audio_to_text(audio)
@@ -135,19 +135,19 @@ def grodio_view(chatbot, chat_input):
             else:
                 user_message += f"音频{i+1}内容：{audio_message}"
 
+    # 图片文件解析
     if images != []:
         # 代办：多图片的处理
         image_url = images
-        image_url0 = image_to_base64(image_url[0])
+        image_base64 = [image_to_base64(image) for image in image_url]
 
-        chatbot[-1][
-            0
-        ] += f"""
-            <div>
-                <img id="myImage" src="data:image/png;base64,{image_url0}" alt="Generated Image" style="max-width: 100%; height: auto; cursor: pointer;" />
-            </div>
-            """
-        yield chatbot
+        for i, image in enumerate(image_base64):
+            chatbot[-1][0]+=f"""
+                <div>
+                    <img src="data:image/png;base64,{image}" alt="Generated Image" style="max-width: 100%; height: auto; cursor: pointer;" />
+                </div>
+                """
+            yield chatbot
     else:
         image_url = None
 
@@ -171,8 +171,8 @@ def grodio_view(chatbot, chat_input):
     answer = get_answer(user_message, chatbot, image_url)
     bot_response = ""
 
-    # 处理文本生成/其他/文档检索
-    if answer[1] == userPurposeType.Unknown or answer[1] == userPurposeType.Document:
+    # 处理文本生成/其他/文档检索/知识图谱检索
+    if answer[1] == userPurposeType.Unknown or answer[1] == userPurposeType.Document or answer[1] == userPurposeType.KnowledgeGraph:
         # 流式输出
         for chunk in answer[0]:
             bot_response = bot_response + (chunk.choices[0].delta.content or "")
@@ -185,8 +185,8 @@ def grodio_view(chatbot, chat_input):
         describe = process_image_describe_tool(
             question_type=userPurposeType.ImageDescribe,
             question="描述这个图片，不要识别‘AI生成’",
-            history=" ",
-            image_url=image_url,
+            history="",
+            image_url=[image_url],
         )
         combined_message = f"""
             **生成的图片:**
@@ -290,8 +290,8 @@ def gradio_audio_view(chatbot, audio_input):
     answer = get_answer(user_message, chatbot)
     bot_response = ""
 
-    # 处理文本生成/其他/文档检索
-    if answer[1] == userPurposeType.Unknown or answer[1] == userPurposeType.Document:
+    # 处理文本生成/其他/文档检索/知识图谱检索
+    if answer[1] == userPurposeType.Unknown or answer[1] == userPurposeType.Document or answer[1] == userPurposeType.KnowledgeGraph:
         # 语音输出
         for chunk in answer[0]:
             # 获取每个块的数据
@@ -314,19 +314,17 @@ def gradio_audio_view(chatbot, audio_input):
             question_type=userPurposeType.ImageDescribe,
             question="描述这个图片，不要识别‘AI生成’",
             history=" ",
-            image_url=image_url,
+            image_url=[image_url],
         )
         combined_message = f"""
-        <div>
-            <p>生成的图片：</p>
-            <img id="myImage" src="{image_url}" alt="Generated Image" style="max-width: 100%; height: auto; cursor: pointer;" />
-            <p>{describe[0]}</p>
-        </div>
-        """
+            **生成的图片:**
+            ![Generated Image]({image_url})
+            {describe[0]}
+            """
         chatbot[-1][1] = combined_message
         yield chatbot
 
-        # 处理视频
+    # 处理视频
     if answer[1] == userPurposeType.Video:
         if answer[0] is not None:
             chatbot[-1][1] = answer[0]
@@ -348,6 +346,20 @@ def gradio_audio_view(chatbot, audio_input):
             chatbot[-1][1] = (
                 audio_generate(
                     text="抱歉，PPT生成失败，请稍后再试",
+                    model_name="zh-CN-YunxiNeural",
+                ),
+                "audio",
+            )
+        yield chatbot
+        
+    # 处理Docx
+    if answer[1] == userPurposeType.Docx:
+        if answer[0] is not None:
+            chatbot[-1][1] = answer[0]
+        else:
+            chatbot[-1][1] = (
+                audio_generate(
+                    text = "抱歉，文档生成失败，请稍后再试",
                     model_name="zh-CN-YunxiNeural",
                 ),
                 "audio",

@@ -6,16 +6,16 @@ from qa.prompt_templates import get_question_parser_prompt
 from qa.purpose_type import purpose_map
 from qa.purpose_type import userPurposeType
 
-from model.KG.search_service import search
-from model.KG.search_model import _Value
-
 from icecream import ic
 
 
 def parse_question(question: str, image_url) -> userPurposeType:
 
-    if "文献" in question or "知识库" in question:
-        return purpose_map["基于文件描述"]
+    if "根据知识库" in question:
+        return purpose_map["基于知识库"]
+    
+    if "根据知识图谱" in question:
+        return purpose_map["基于知识图谱"]
 
     if "搜索" in question:
         return purpose_map["网络搜索"]
@@ -43,9 +43,4 @@ def parse_question(question: str, image_url) -> userPurposeType:
     return purpose_map["其他"]
 
 
-def check_entity(question: str) -> List[Dict]:
-    code, result = search(question)
-    if code == 0:
-        return result
-    else:
-        return None
+

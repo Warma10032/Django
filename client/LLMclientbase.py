@@ -26,18 +26,10 @@ class LLMclientbase(object):
 
     @property
     def client(self):
-        """
-        获取OpenAI客户端实例
-        :return: OpenAI客户端实例
-        """
         return self.__client
 
     @property
     def model_name(self):
-        """
-        获取模型名称
-        :return: 模型名称
-        """
         return self.__model_name
 
     # 以下全都是抽象函数

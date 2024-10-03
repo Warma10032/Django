@@ -4,12 +4,11 @@ from model.model_base import Modelbase
 from model.model_base import ModelStatus
 
 import ahocorasick as pyahocorasick
+from config.config import Config
 from model.KG.data_utils import NodeEntities
 
 from collections import namedtuple
 
-FIELD_NAMES = {"name"}
-_Value = namedtuple("_Value", (fn for fn in FIELD_NAMES))
 
 
 class EntitySearcher(Modelbase):
@@ -17,7 +16,7 @@ class EntitySearcher(Modelbase):
     def __init__(self, *args, **krgs):
         super().__init__(*args, **krgs)
         self._node_entities = NodeEntities()
-        self._search_key = "name"
+        self._search_key = Config.get_instance().get_with_nested_params("model", "graph-entity", "search-key")
         self.build()
 
     def build(self, *args, **kwargs):
@@ -41,9 +40,8 @@ class EntitySearcher(Modelbase):
             # value = _Value(*values)
             automaton.add_word(entity[self._search_key], (i, entity))
 
-        automaton.make_automaton()
-
-        self._model = automaton
+        automaton.make_automaton()  # 构建自动机
+        self._model = automaton  # 将自动机模型保存到实例变量中
 
     def search(self, query: str) -> Tuple[Optional[List[Dict]]]:
 

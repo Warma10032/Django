@@ -1,6 +1,6 @@
 from client.ourAPI.client import OurAPI
-from client.zhipuAPI.client import Image_client, Image_describe_client
-from client.zhipuAPI.client import Video_client
+from client.zhipuAPI.client import Image_generate_client, Image_describe_client
+from client.zhipuAPI.client import Video_generate_client
 from env import get_env_value
 from qa.purpose_type import userPurposeType
 
@@ -27,15 +27,15 @@ class Clientfactory:
         :param client_type: 客户端类型，字符串类型
         :return: 对应的客户端实例
         """
-        print(userPurposeType.ImageGeneration)
+        print("get_special_client")
         if client_type == userPurposeType.ImageGeneration:
-            return Image_client
+            return Image_generate_client
         if client_type == userPurposeType.Unknown:
             return OurAPI()
         if client_type == userPurposeType.ImageDescribe:
             return Image_describe_client
         if client_type == userPurposeType.Video:
-            return Video_client
+            return Video_generate_client
 
         # 默认情况下使用文本生成模型
         return OurAPI()

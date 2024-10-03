@@ -3,13 +3,15 @@ cache:
     fields:
       - name
   async: thread
+
 model:
   graph-entity:
-    search-key: name
+    # 知识图谱中检索实体时的搜索主键，即匹配这个键对应的值
+    search-key: '名称'
   embedding: 
+    # 知识库用于自然语言（文本）处理的模型路径
     model-name: C:\Users\16013\.cache\modelscope\hub\iic\nlp_corom_sentence-embedding_chinese-base
     device: cpu
-
 
 database:
   neo4j:
@@ -18,3 +20,6 @@ database:
     username: neo4j
     # 注意数字用引号引起来
     password: TangZiYe20050316
+    # 定义你的数据库存在的节点标签和关系类型，用于检索
+    node-label: ['一级科室', '二级科室', '其他',"检查手段","治疗方案","生产商","疾病","症状","药物","食物","食谱"]
+    relationship-type: ['好评药物', '宜吃', '属于', '常用药物', '并发症','忌吃','所属科室','推荐食谱','治疗方法','生产药品','症状','诊断建议']
